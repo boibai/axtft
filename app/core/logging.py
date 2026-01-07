@@ -13,4 +13,4 @@ def write_json_log(
 
     path = os.path.join(dir_path, filename)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(data, f, ensure_ascii=False, indent=4)

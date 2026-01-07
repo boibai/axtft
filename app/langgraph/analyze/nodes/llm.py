@@ -1,4 +1,4 @@
-import time, httpx
+import time, httpx, json
 from app.langgraph.analyze.state import AnalyzeState
 from app.core.config import VLLM_BASE_URL, MODEL_NAME
 from app.models.schema import CauseList
@@ -35,7 +35,14 @@ async def call_llm(state: AnalyzeState) -> AnalyzeState:
     resp.raise_for_status()
 
     data = resp.json()
+
     state["llm_content"] = data["choices"][0]["message"]["content"]
     state["elapsed_sec"] = round(time.perf_counter() - start, 3)
+
+    usage = data.get("usage", {})
+    state["model_name"] = MODEL_NAME
+    state["prompt_tokens"] = usage.get("prompt_tokens")
+    state["completion_tokens"] = usage.get("completion_tokens")
+    state["total_tokens"] = usage.get("total_tokens")
 
     return state
