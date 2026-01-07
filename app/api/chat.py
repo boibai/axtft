@@ -1,17 +1,11 @@
 from fastapi import APIRouter, Request
-from pydantic import BaseModel
 import uuid
 
 from app.services.chat_client import chat_log
 from app.utils.network import get_client_addr
+from app.models.schema import ChatRequest
 
 router = APIRouter()
-
-
-class ChatRequest(BaseModel):
-    message: str
-    thread_id: str | None = None
-
 
 @router.post("/chat")
 async def chat(req: ChatRequest, request: Request):
