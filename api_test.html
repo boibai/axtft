@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>LLM Analyze & Chat Test</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #020617;
+      --border: #1e293b;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      display: flex;
+      height: 100%;
+    }
+
+    .pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+    }
+
+    .pane:last-child {
+      border-right: none;
+    }
+
+    .header {
+      padding: 10px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 8px;
+    }
+
+    .log {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .input-panel {
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 300px;
+      resize: vertical;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      font-family: inherit;
+      font-size: 12px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    button {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #020617;
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    .meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Analyze -->
+  <div class="pane">
+    <div class="header">Analyze</div>
+    <div class="content">
+      <div class="log" id="analyzeLog"></div>
+
+      <div class="input-panel">
+        <textarea id="analyzeInput" placeholder="에러 로그 입력"></textarea>
+        <div class="actions">
+          <button class="primary" onclick="analyze()">Analyze</button>
+          <button onclick="clearAnalyze()">Clear</button>
+          <div class="meta">
+            Latency: <span id="analyzeLatency">-</span> ms
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="pane">
+    <div class="header">Chat</div>
+    <div class="content">
+      <div class="log" id="chatLog"></div>
+
+      <div class="input-panel">
+        <textarea id="chatInput" placeholder="메시지 입력"></textarea>
+        <div class="actions">
+          <button class="primary" onclick="chat()">Send</button>
+          <button onclick="clearChat()">Clear</button>
+          <button onclick="newChatSession()">New Session</button>
+          <div class="meta">
+            Thread: <span id="chatThread">null</span> |
+            Latency: <span id="chatLatency">-</span> ms
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const ANALYZE_URL = "http://172.25.237.109:9000/analyze";
+  const CHAT_URL = "http://172.25.237.109:9000/chat";
+
+  let chatThreadId = null;
+
+  function append(el, text) {
+    el.textContent += text + "\n\n";
+    el.scrollTop = el.scrollHeight;
+  }
+
+  async function analyze() {
+    const input = document.getElementById("analyzeInput").value.trim();
+    if (!input) return;
+
+    const start = performance.now();
+    const res = await fetch(ANALYZE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: input })
+    });
+
+    const data = await res.json();
+    document.getElementById("analyzeLatency").textContent =
+      Math.round(performance.now() - start);
+
+    append(document.getElementById("analyzeLog"),
+      JSON.stringify(data, null, 2));
+  }
+
+  function clearAnalyze() {
+    document.getElementById("analyzeLog").textContent = "";
+  }
+
+  async function chat() {
+    const input = document.getElementById("chatInput").value.trim();
+    if (!input) return;
+
+    const start = performance.now();
+    const res = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: input, thread_id: chatThreadId })
+    });
+
+    const data = await res.json();
+    chatThreadId = data.thread_id;
+
+    document.getElementById("chatThread").textContent = chatThreadId;
+    document.getElementById("chatLatency").textContent =
+      Math.round(performance.now() - start);
+
+    append(document.getElementById("chatLog"), "> " + input);
+    append(document.getElementById("chatLog"), "< " + data.reply);
+
+    document.getElementById("chatInput").value = "";
+  }
+
+  function clearChat() {
+    document.getElementById("chatLog").textContent = "";
+  }
+
+  function newChatSession() {
+    chatThreadId = null;
+    document.getElementById("chatThread").textContent = "null";
+    append(document.getElementById("chatLog"), "=== NEW SESSION ===");
+  }
+</script>
+
+</body>
+</html>
