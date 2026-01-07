@@ -7,8 +7,8 @@
     :root {
       --bg: #0f172a;
       --panel: #020617;
-      --border: #1e293b;
-      --text: #e5e7eb;
+      --border: #263c5f;
+      --text: #e6ebe5;
       --muted: #94a3b8;
       --accent: #38bdf8;
     }
@@ -57,7 +57,7 @@
 
     .log {
       flex: 1;
-      background: var(--panel);
+      background: #020617;
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 10px;
@@ -65,6 +65,9 @@
       white-space: pre-wrap;
       font-size: 11px;
       line-height: 1.5;
+
+      color: #00ff6a;
+      text-shadow: 0 0 6px rgba(0, 255, 106, 0.25);
     }
 
     .input-panel {
@@ -79,14 +82,15 @@
       width: 100%;
       min-height: 300px;
       resize: vertical;
-      background: var(--panel);
-      color: var(--text);
+      background: #020617;
+      color: #e5e7eb;
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 8px;
       font-family: inherit;
       font-size: 12px;
     }
+
 
     .actions {
       display: flex;
