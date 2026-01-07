@@ -31,6 +31,12 @@ async def call_llm(state: ChatState) -> ChatState:
         state["elapsed_sec"] = round(time.perf_counter() - start, 3)
         state["error"] = None
 
+        usage = data.get("usage", {})
+        state["model_name"] = MODEL_NAME
+        state["prompt_tokens"] = usage.get("prompt_tokens")
+        state["completion_tokens"] = usage.get("completion_tokens")
+        state["total_tokens"] = usage.get("total_tokens")
+        
         # memory 저장 (system 제외)
         save_memory(state["thread_id"], state["messages"][1:] + [
             {"role": "assistant", "content": reply}

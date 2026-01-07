@@ -9,7 +9,12 @@ class AnalyzeState(TypedDict):
 
     # LLM raw output
     llm_content: Optional[str]
-
+    llm_content: str
+    model_name: str
+    prompt_tokens: Optional[int]
+    completion_tokens: Optional[int]
+    total_tokens: Optional[int]
+    
     # parsed result
     parsed_json: Optional[Dict[str, Any]]
 

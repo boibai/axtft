@@ -25,7 +25,12 @@ async def analyze_log(
         "timestamp": now_kst().isoformat(),
         "client_ip": client_ip,
         "client_port": client_port,
+        "model_name": result.get("model_name"),
+        "prompt_tokens": result.get("prompt_tokens"),
+        "completion_tokens": result.get("completion_tokens"),
+        "total_tokens": result.get("total_tokens"),
         "elapsed_sec": result.get("elapsed_sec"),
+        "input_text": message,
         "output_json": result.get("parsed_json"),
         "error_message": result.get("error"),
     }

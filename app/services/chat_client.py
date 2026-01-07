@@ -30,6 +30,10 @@ async def chat_log(
         "client_ip": client_ip,
         "client_port": client_port,
         "elapsed_sec": result.get("elapsed_sec"),
+        "model_name": result.get("model_name"),
+        "prompt_tokens": result.get("prompt_tokens"),
+        "completion_tokens": result.get("completion_tokens"),
+        "total_tokens": result.get("total_tokens"),
         "reply": result.get("reply"),
         "error_message": result.get("error"),
     }
