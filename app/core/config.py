@@ -8,7 +8,7 @@ os.makedirs(LOG_DIR, exist_ok=True)
 # vLLM
 VLLM_BASE_URL = os.getenv(
     "VLLM_BASE_URL",
-    "http://localhost:8000/v1/chat/completions" # "http://localhost:8000/v1/chat/completions" / "http://host.docker.internal:8000/v1/chat/completions"
+    "http://host.docker.internal:8000/v1/chat/completions" # "http://localhost:8000/v1/chat/completions" / "http://host.docker.internal:8000/v1/chat/completions"
 )
 MODEL_NAME = os.getenv("MODEL_NAME", "gemma-3n-E4B-it")
 
