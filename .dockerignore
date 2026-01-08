@@ -4,6 +4,7 @@ __pycache__/
 
 # Logs
 logs/
+models/
 
 # Git
 .git/
