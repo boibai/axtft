@@ -22,14 +22,24 @@ stages:
       vmImage: ubuntu-latest
     steps:
     - task: Docker@2
-      displayName: Build And Push
+      displayName: Build (with cache)
       inputs:
-        command: buildAndPush
+        command: build
         containerRegistry: dockerhub-connection
-        repository: $(imageName)
+        repository: hwangjaesick/axtft
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+        arguments: |
+          --cache-from=hwangjaesick/axtft:latest
         tags: |
-          $(tag)
+          $(Build.BuildId)
           latest
-        arguments : |
-          --cache-from=$(imageName):latest
+
+    - task: Docker@2
+      displayName: Push
+      inputs:
+        command: push
+        containerRegistry: dockerhub-connection
+        repository: hwangjaesick/axtft
+        tags: |
+          $(Build.BuildId)
+          latest
