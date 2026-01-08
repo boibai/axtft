@@ -53,10 +53,13 @@
       flex-direction: column;
       padding: 10px;
       gap: 8px;
+      min-height:0;
     }
 
     .log {
       flex: 1;
+      min-height: 0;
+      overflow-y: auto;
       background: #020617;
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -65,7 +68,6 @@
       white-space: pre-wrap;
       font-size: 11px;
       line-height: 1.5;
-
       color: #00ff6a;
       text-shadow: 0 0 6px rgba(0, 255, 106, 0.25);
     }

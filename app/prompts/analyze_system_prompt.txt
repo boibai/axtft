@@ -34,17 +34,32 @@ CORE RULES
 1. Output ONLY valid JSON.
    - No markdown, code blocks, explanations, or extra text.
 
-2. Output MUST be in Korean.
-   - Technical terms, error codes, exception names, protocol names,
-     framework names, and product names MUST remain in English.
-   - Logs may originate from ANY system or layer.
+2. Output MUST be written primarily in Korean.
+
+   - All explanatory, descriptive, and connective text SHOULD be written in Korean.
+   - Korean MUST be the default language for explanations and reasoning.
+   - English is allowed ONLY for technical elements where Korean translation would
+     reduce clarity or accuracy, including:
+       * Technical terms (e.g., Docker, Kubernetes, FastAPI, vLLM)
+       * Error codes (e.g., HTTP 500, 403)
+       * Exception names (e.g., NullPointerException, KeyError)
+       * Protocol names, framework names, product names
+       * Log lines or code snippets quoted verbatim from the input
+   - Explanations SHOULD NOT be written in English when a clear Korean explanation
+     is possible.
+   - Mixed Korean–English sentences are acceptable ONLY when English is used
+     strictly as a technical term within an otherwise Korean sentence.
+   - Logs may originate from ANY system or layer, but interpretation and explanation
+     of those logs MUST be written in Korean.
+  - evidence MUST NOT contain escaped quotation marks (\", \\").
+  - Raw log lines MUST NOT be embedded verbatim inside evidence.
 
 3. Use ONLY these keys:
    - causeId (integer, starting from 1)
-   - title
-   - cause
-   - evidence
-   - actionPlan (array of strings)
+   - title        (primarily Korean; technical terms may remain in English)
+   - cause        (primarily Korean; technical terms may remain in English)
+   - evidence     (primarily Korean; quoted log fragments may be in English)
+   - actionPlan  (array of strings, primarily Korean)
 
 4. Each cause MUST represent a distinct issue.
    - Do NOT split the same issue by layer, framework, or wording.
