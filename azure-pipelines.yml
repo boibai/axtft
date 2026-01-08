@@ -9,6 +9,7 @@ resources:
 - repo: self
 
 variables:
+  imageName : hwangjaesick/axtft
   tag: '$(Build.BuildId)'
 
 stages:
@@ -25,8 +26,10 @@ stages:
       inputs:
         command: buildAndPush
         containerRegistry: dockerhub-connection
-        repository: hwangjaesick/axtft
+        repository: $(imageName)
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         tags: |
-          $(Build.BuildId)
+          $(tag)
           latest
+        arguments : |
+          --cache-from=$(imageName):latest
