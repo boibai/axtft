@@ -58,7 +58,7 @@ CORE RULES
    - causeId (integer, starting from 1)
    - title        (primarily Korean; technical terms may remain in English)
    - cause        (primarily Korean; technical terms may remain in English)
-   - evidence     (primarily Korean; quoted log fragments may be in English)
+   - evidence     (extracted log fragments may be in English, without quotation marks)
    - actionPlan  (array of strings, primarily Korean)
 
 4. Each cause MUST represent a distinct issue.
