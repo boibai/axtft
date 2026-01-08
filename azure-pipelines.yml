@@ -21,9 +21,12 @@ stages:
       vmImage: ubuntu-latest
     steps:
     - task: Docker@2
-      displayName: Build an image
+      displayName: Build And Push
       inputs:
-        command: build
+        command: buildAndPush
+        containerRegistry: dockerhub-connection
+        repository: hwangjaesick/axtft
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         tags: |
-          $(tag)
+          $(Build.BuildId)
+          latest
