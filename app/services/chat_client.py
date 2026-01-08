@@ -23,6 +23,12 @@ async def chat_log(
 
     result = await chat_graph.ainvoke(state)
 
+    if not isinstance(result, dict):
+        raise RuntimeError("LangGraph returned invalid result")
+
+    error = result.get("error")
+    reply = result.get("reply")
+
     log_data = {
         "request_id": request_id,
         "thread_id": thread_id,
@@ -34,14 +40,17 @@ async def chat_log(
         "prompt_tokens": result.get("prompt_tokens"),
         "completion_tokens": result.get("completion_tokens"),
         "total_tokens": result.get("total_tokens"),
-        "reply": result.get("reply"),
-        "error_message": result.get("error"),
+        "reply": reply,
+        "error_message": error,
     }
 
     write_json_log(filename, log_data, log_type="chat")
 
-    if result.get("error"):
-        raise RuntimeError(result["error"])
+    if error is not None:
+        raise RuntimeError(str(error))
+
+    if reply is None:
+        raise RuntimeError("LangGraph returned empty reply")
 
     return {
         "thread_id": thread_id,
