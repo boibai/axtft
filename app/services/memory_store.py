@@ -16,9 +16,27 @@ def get_memory(thread_id: str) -> List[dict]:
 
 def save_memory(thread_id: str, messages: List[dict]):
     """
-    messages: system 제외한 [user, assistant, ...]
+    Store ONLY user / assistant messages.
+    System messages must NEVER be stored.
     """
-    while messages and total_tokens(messages) > MAX_MEMORY_TOKENS:
-        messages.pop(0)
 
-    _CHAT_MEMORY[thread_id] = messages
+    # role whitelist
+    filtered = [
+        {
+            "role": m["role"],
+            "content": m["content"]
+        }
+        for m in messages
+        if m.get("role") in ("user", "assistant")
+    ]
+
+    # content는 반드시 str
+    for m in filtered:
+        if not isinstance(m["content"], str):
+            m["content"] = json.dumps(m["content"], ensure_ascii=False)
+
+    # token limit 관리
+    while filtered and total_tokens(filtered) > MAX_MEMORY_TOKENS:
+        filtered.pop(0)
+
+    _CHAT_MEMORY[thread_id] = filtered

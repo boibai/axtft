@@ -19,6 +19,7 @@ async def chat_log(
         "message": message,
         "client_ip": client_ip,
         "client_port": client_port,
+        "search_used_in_turn": False,
     }
 
     result = await chat_graph.ainvoke(state)
