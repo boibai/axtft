@@ -23,28 +23,31 @@ async def call_llm(state: ChatState) -> ChatState:
             },
         )
         resp.raise_for_status()
-
         data = resp.json()
+
         reply = data["choices"][0]["message"]["content"]
-
-        state["reply"] = reply
-        state["elapsed_sec"] = round(time.perf_counter() - start, 3)
-        state["error"] = None
-
         usage = data.get("usage", {})
-        state["model_name"] = MODEL_NAME
-        state["prompt_tokens"] = usage.get("prompt_tokens")
-        state["completion_tokens"] = usage.get("completion_tokens")
-        state["total_tokens"] = usage.get("total_tokens")
-        
-        # memory 저장 (system 제외)
-        save_memory(state["thread_id"], state["messages"][1:] + [
-            {"role": "assistant", "content": reply}
-        ])
+
+        state.update({
+            "reply": reply,
+            "model_name": MODEL_NAME,
+            "prompt_tokens": usage.get("prompt_tokens"),
+            "completion_tokens": usage.get("completion_tokens"),
+            "total_tokens": usage.get("total_tokens"),
+            "elapsed_sec": round(time.perf_counter() - start, 3),
+            "error": None,
+        })
+
+        save_memory(
+            state["thread_id"],
+            state["messages"][1:] + [{"role": "assistant", "content": reply}],
+        )
 
     except Exception as e:
-        state["reply"] = None
-        state["elapsed_sec"] = round(time.perf_counter() - start, 3)
-        state["error"] = str(e)
+        state.update({
+            "reply": None,
+            "error": str(e),
+            "elapsed_sec": round(time.perf_counter() - start, 3),
+        })
 
     return state

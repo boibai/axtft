@@ -8,7 +8,7 @@ os.makedirs(LOG_DIR, exist_ok=True)
 # vLLM
 VLLM_BASE_URL = os.getenv(
     "VLLM_BASE_URL",
-    "http://host.docker.internal:8000/v1/chat/completions" # "http://localhost:8000/v1/chat/completions" / "http://host.docker.internal:8000/v1/chat/completions"
+    "http://localhost:8000/v1/chat/completions" # "http://localhost:8000/v1/chat/completions" / "http://host.docker.internal:8000/v1/chat/completions"
 )
 MODEL_NAME = os.getenv("MODEL_NAME", "gemma-3n-E4B-it")
 
@@ -23,6 +23,16 @@ CHAT_SYSTEM_PROMPT_PATH = os.getenv(
     "./app/prompts/chat_system_prompt.txt"
 )
 
+AGENT_DECISION_PROMPT_PATH = os.getenv(
+    "CHAT_SYSTEM_PROMPT_PATH",
+    "./app/prompts/agent_decision_prompt.txt"
+)
+
+TAVILY_CHAT_SYSTEM_PROMPT_PATH =  os.getenv(
+    "TAVILY_CHAT_SYSTEM_PROMPT_PATH",
+    "./app/prompts/tavily_chat_system_prompt.txt"
+)
+
 # IP Whitelist
 ENABLE_IP_WHITELIST = (
     os.getenv("ENABLE_IP_WHITELIST", "false").lower() == "true"
@@ -34,6 +44,9 @@ ALLOWED_NETWORKS = [
         "1.232.105.101"
     ).split(",")
 ]
+
+# Tavily
+TAVILY_API_KEY="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"
 
 
 

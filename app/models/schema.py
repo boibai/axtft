@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Literal
 
 class AnalyzeRequest(BaseModel):
     message: str
@@ -17,3 +17,7 @@ class CauseList(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     thread_id: Optional[str] = None
+
+class Decision(BaseModel):
+    action: Literal["direct", "search"]
+    search_query: Optional[str]
