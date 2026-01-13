@@ -15,6 +15,7 @@ with open(AGENT_DECISION_PROMPT_PATH, "r", encoding="utf-8") as f:
 with open(TAVILY_CHAT_SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
     build_tavily_messages_prompt = Template(f.read())
 
+
 def build_chat_messages(state: ChatState) -> ChatState:
     history = get_memory(state["thread_id"])
     history_text = stringify_history(history)
@@ -41,9 +42,7 @@ def build_chat_messages(state: ChatState) -> ChatState:
 
 
 def build_decision_messages(state: ChatState) -> list:
-    """
-    decision 판단을 위한 messages 생성
-    """
+    print("\n"+"="*20+" DECISION NODE START\n")
     history = get_memory(state["thread_id"])
     history_text = stringify_history(history)
 
@@ -70,7 +69,7 @@ USER QUESTION
 
 
 def build_search_messages(state: ChatState) -> ChatState:
-
+    
     today = date.today().isoformat()
 
     system_text = build_tavily_messages_prompt.safe_substitute(
@@ -103,5 +102,4 @@ SEARCH RESULTS
             "type": "final"
         }
     ]
-    print(state)
     return state

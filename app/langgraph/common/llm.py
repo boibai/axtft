@@ -49,6 +49,7 @@ async def call_analyze_llm(state: AnalyzeState) -> AnalyzeState:
     return state
 
 async def call_chat_llm(state: ChatState) -> ChatState:
+
     start = time.perf_counter()
 
     payload = {
@@ -124,5 +125,7 @@ async def call_decision_llm(messages: list) -> dict:
     resp.raise_for_status()
 
     content = resp.json()["choices"][0]["message"]["content"]
-    print(content)
+    result = json.loads(content)
+    print(f"- action : {result.get('action')}")
+    print(f"- search query : {result.get('search_query')}")
     return json.loads(content)

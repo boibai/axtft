@@ -7,6 +7,7 @@ router = APIRouter()
 
 @router.post("/analyze")
 async def analyze(req: AnalyzeRequest, request: Request):
+    print("\n"+"="*20+" ANALYZE API\n")
     client_ip, client_port = get_client_addr(request)
     return await handle_analyze_request(
         message=req.message,
