@@ -1,4 +1,5 @@
 from typing import Dict, List
+import json, re
 
 _CHAT_MEMORY: Dict[str, List[dict]] = {}
 
@@ -14,29 +15,39 @@ def total_tokens(messages: List[dict]) -> int:
 def get_memory(thread_id: str) -> List[dict]:
     return _CHAT_MEMORY.get(thread_id, [])
 
+def strip_search_result(text: str) -> str:
+    """
+    SEARCH RESULTS 블록 제거
+    """
+    pattern = re.compile(
+        r"-{32,}\s*SEARCH RESULTS\s*-{32,}.*?-{32,}\s*USER QUESTION\s*-{32,}",
+        re.DOTALL
+    )
+    return re.sub(pattern, "", text).strip()
+
 def save_memory(thread_id: str, messages: List[dict]):
-    """
-    Store ONLY user / assistant messages.
-    System messages must NEVER be stored.
-    """
+    prev = _CHAT_MEMORY.get(thread_id, [])
+    filtered = []
 
-    # role whitelist
-    filtered = [
-        {
+    for m in messages:
+        if m.get("type") != "final":
+            continue
+        if m.get("role") not in ("user", "assistant"):
+            continue
+
+        content = m.get("content")
+        if not isinstance(content, str):
+            content = json.dumps(content, ensure_ascii=False)
+
+        filtered.append({
             "role": m["role"],
-            "content": m["content"]
-        }
-        for m in messages
-        if m.get("role") in ("user", "assistant")
-    ]
+            "content": content
+        })
 
-    # content는 반드시 str
-    for m in filtered:
-        if not isinstance(m["content"], str):
-            m["content"] = json.dumps(m["content"], ensure_ascii=False)
+    merged = prev + filtered
 
-    # token limit 관리
-    while filtered and total_tokens(filtered) > MAX_MEMORY_TOKENS:
-        filtered.pop(0)
+    while merged and total_tokens(merged) > MAX_MEMORY_TOKENS:
+        merged.pop(0)
 
-    _CHAT_MEMORY[thread_id] = filtered
+    _CHAT_MEMORY[thread_id] = merged
+

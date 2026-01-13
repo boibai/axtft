@@ -3,7 +3,7 @@ import uuid
 
 from app.services.chat_client import chat_log
 from app.utils.network import get_client_addr
-from app.models.schema import ChatRequest
+from app.langgraph.common.schema import ChatRequest
 
 router = APIRouter()
 

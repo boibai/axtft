@@ -1,4 +1,4 @@
-import uuid
+import uuid, json
 from app.langgraph.chat.graph import chat_graph
 from app.core.logging import write_json_log
 from app.core.time import now_kst, now_kst_str
