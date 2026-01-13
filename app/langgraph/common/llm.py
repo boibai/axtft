@@ -2,7 +2,7 @@ import time, httpx, json
 from app.langgraph.common.state import AnalyzeState, ChatState
 from app.langgraph.common.schema import CauseList, Decision
 from app.core.config import VLLM_BASE_URL, MODEL_NAME
-from app.services.memory_store import save_memory
+from app.langgraph.common.chat_memory import save_memory
 
 # connect : TCP 연결 수립까지 허용 시간 (서버가 안 살아있거나 네트워크 문제 시 여기서 끊김)
 # read : 서버가 응답 바디를 보내기까지 기다리는 최대 시간 (LLM 추론처럼 오래 걸리는 요청에 중요)
@@ -55,7 +55,7 @@ async def call_chat_llm(state: ChatState) -> ChatState:
         "model": MODEL_NAME,
         "messages": state["messages"],
         "temperature": 0.0,
-        "max_tokens": 1024
+        "max_tokens": 4096
     }
 
     try:
@@ -63,7 +63,6 @@ async def call_chat_llm(state: ChatState) -> ChatState:
         resp.raise_for_status()
 
         data = resp.json()
-
         reply = data["choices"][0]["message"]["content"]
         usage = data.get("usage", {})
 

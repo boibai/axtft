@@ -3,7 +3,7 @@ from app.langgraph.chat.graph import chat_graph
 from app.core.logging import write_json_log
 from app.core.time import now_kst, now_kst_str
 
-async def chat_log(
+async def handle_chat_request(
     message: str,
     thread_id: str,
     client_ip: str | None,

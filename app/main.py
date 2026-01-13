@@ -10,9 +10,9 @@ app.middleware("http")(ip_whitelist_middleware)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # 테스트용
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],   # OPTIONS 포함
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 

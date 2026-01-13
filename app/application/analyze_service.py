@@ -3,7 +3,7 @@ from app.langgraph.analyze.graph import analyze_graph
 from app.core.logging import write_json_log
 from app.core.time import now_kst, now_kst_str
 
-async def analyze_log(
+async def handle_analyze_request(
     message: str,
     client_ip: str | None,
     client_port: int | None,

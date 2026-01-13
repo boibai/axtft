@@ -1,5 +1,5 @@
 from app.langgraph.common.state import ChatState
-from app.langgraph.common.prompt import build_decision_messages
+from app.langgraph.chat.nodes.build_chat_messages import build_decision_messages
 from app.langgraph.common.llm import call_decision_llm
 
 async def decide_action(state: ChatState) -> ChatState:
