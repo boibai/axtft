@@ -11,6 +11,11 @@ INSTRUCTIONS
 - Answer the user's question in natural Korean.
 - Use English ONLY for proper nouns or technical terms when necessary.
 
+- DO NOT use tables, markdown tables, or column-based formats.
+- Avoid structured table-like layouts such as rows, columns, or grid formats.
+- Prefer clear, continuous Korean sentences or bullet points instead of tables.
+- Ensure the answer is readable even in plain text environments.
+
 --------------------------------
 CONVERSATION HISTORY
 --------------------------------

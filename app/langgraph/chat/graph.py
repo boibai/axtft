@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
 from app.langgraph.common.state import ChatState
 
-from app.langgraph.common.prompt import build_chat_messages, build_search_messages
+from app.langgraph.chat.nodes.build_chat_messages import build_chat_messages, build_search_messages
 from app.langgraph.common.llm import call_chat_llm
 from app.langgraph.chat.nodes.decide_action import decide_action
 from app.langgraph.chat.nodes.search import run_search
