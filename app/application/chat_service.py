@@ -53,6 +53,8 @@ async def handle_chat_request(
     if reply is None:
         raise RuntimeError("LangGraph returned empty reply")
 
+    print("="*20+" RESULTS\n")
+    print(f"- answer : \n\n{result["reply"]}")
     return {
         "thread_id": thread_id,
         "reply": result["reply"],
