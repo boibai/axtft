@@ -1,5 +1,5 @@
-from app.langgraph.analyze.state import AnalyzeState
-from app.models.schema import CauseList
+from app.langgraph.common.state import AnalyzeState
+from app.langgraph.common.schema import CauseList
 
 def validate_schema(state: AnalyzeState) -> AnalyzeState:
     if state["parsed_json"] is None:

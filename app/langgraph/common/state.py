@@ -1,21 +1,28 @@
-from typing import TypedDict, Optional, List, Dict, Literal
+from typing import TypedDict, Optional, Any, Dict, List, Literal
 
-# class ChatState(TypedDict):
-#     request_id: str
-#     thread_id: str
+class AnalyzeState(TypedDict):
+    request_id: str
+    message: str
 
-#     model_name: str
-#     prompt_tokens: Optional[int]
-#     completion_tokens: Optional[int]
-#     total_tokens: Optional[int]
+    # prompt / messages
+    messages: List[Dict[str, str]]
+
+    # LLM raw output
+    llm_content: Optional[str]
+    llm_content: str
+    model_name: str
+    prompt_tokens: Optional[int]
+    completion_tokens: Optional[int]
+    total_tokens: Optional[int]
     
-#     message: str
+    # parsed result
+    parsed_json: Optional[Dict[str, Any]]
 
-#     messages: Optional[List[Dict[str, str]]]
-
-#     reply: Optional[str]
-#     elapsed_sec: Optional[float]
-#     error: Optional[str]
+    # meta
+    client_ip: Optional[str]
+    client_port: Optional[int]
+    elapsed_sec: Optional[float]
+    error: Optional[str]
 
 
 class ChatState(TypedDict):
@@ -42,4 +49,5 @@ class ChatState(TypedDict):
     searched: bool
     searched_for_request: Optional[str] 
     search_used_in_turn: bool
+
 

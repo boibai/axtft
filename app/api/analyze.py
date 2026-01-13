@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
-from app.models.schema import AnalyzeRequest
 from app.services.vllm_client import analyze_log
 from app.utils.network import get_client_addr
+from app.langgraph.common.schema import AnalyzeRequest
 
 router = APIRouter()
 

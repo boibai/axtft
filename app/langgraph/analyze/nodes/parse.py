@@ -1,5 +1,5 @@
 import json
-from app.langgraph.analyze.state import AnalyzeState
+from app.langgraph.common.state import AnalyzeState
 
 def parse_json(state: AnalyzeState) -> AnalyzeState:
     try:
