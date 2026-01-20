@@ -1,8 +1,8 @@
 from langgraph.graph import StateGraph, END
 from app.langgraph.common.state import ChatState
+from app.langgraph.common.llm import call_chat_llm
 
 from app.langgraph.chat.nodes.build_chat_messages import build_chat_messages, build_search_messages
-from app.langgraph.common.llm import call_chat_llm
 from app.langgraph.chat.nodes.decide_action import decide_action
 from app.langgraph.chat.nodes.search import run_search
 
@@ -32,7 +32,7 @@ graph.add_edge("build_messages", "call_llm")
 graph.add_edge("search", "build_search_messages")
 graph.add_edge("build_search_messages", "call_llm")
 
-# call_llm 뒤에는 무조건 종료
+# call_llm 후 종료
 graph.add_edge("call_llm", END)
 
 chat_graph = graph.compile()

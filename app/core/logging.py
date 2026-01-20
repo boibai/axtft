@@ -6,7 +6,7 @@ from app.core.config import LOG_DIR
 def write_json_log(
     filename: str,
     data: Dict,
-    log_type: str,  # "chat" | "analyze"
+    log_type: str,
 ):
     dir_path = os.path.join(LOG_DIR, log_type)
     os.makedirs(dir_path, exist_ok=True)

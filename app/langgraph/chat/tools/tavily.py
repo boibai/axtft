@@ -5,6 +5,12 @@ tavily_tool = TavilySearch(
     tavily_api_key=TAVILY_API_KEY,
     search_depth="advanced",
     max_results=5,
+    exclude_domains=[
+        "youtube.com",
+        "www.youtube.com",
+        "m.youtube.com",
+        "youtu.be"
+    ],
 )
 
 def run_tavily(query: str) -> str:
@@ -12,7 +18,7 @@ def run_tavily(query: str) -> str:
 
 def preprocess_tavily_results(raw_results: dict) -> list:
     cleaned = []
-
+    MAX_CONTENT_LEN = 700
     for r in raw_results.get("results", []):
         content = r.get("content", "").strip()
         score = r.get("score")
@@ -27,7 +33,7 @@ def preprocess_tavily_results(raw_results: dict) -> list:
             "title": r.get("title"),
             "url": r.get("url"),
             "score": score,
-            "content": content,  # [:MAX_CONTENT_LEN] 가능
+            "content": content[:MAX_CONTENT_LEN],  # [:MAX_CONTENT_LEN]
         })
 
     return cleaned

@@ -77,13 +77,11 @@ def build_search_messages(state: ChatState) -> ChatState:
     )
 
     state["messages"] = [
-        # system 프롬프트 (규칙 / 지침)
         {
             "role": "system",
             "content": system_text
         },
 
-        # 검색 결과: user role + search_context
         {
             "role": "user",
             "content": f"""
@@ -94,8 +92,7 @@ SEARCH RESULTS
 """,
             "type": "search_context"
         },
-
-        # 실제 사용자 질문: user role + final
+        
         {
             "role": "user",
             "content": state["message"],
