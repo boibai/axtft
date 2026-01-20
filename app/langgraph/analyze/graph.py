@@ -1,8 +1,8 @@
 from langgraph.graph import StateGraph, END
 from app.langgraph.common.state import AnalyzeState
+from app.langgraph.common.llm import call_analyze_llm
 
 from app.langgraph.analyze.nodes.build_anaylze_messages import build_anaylze_messages
-from app.langgraph.common.llm import call_analyze_llm
 from app.langgraph.analyze.nodes.parse import parse_json
 from app.langgraph.analyze.nodes.validate import validate_schema
 
