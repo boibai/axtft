@@ -9,7 +9,7 @@ class CauseItem(BaseModel):
     title: str
     cause: str
     evidence: str
-    actionPlan: List[str]
+    actionPlan: str#List[str]
 
 class CauseList(BaseModel):
     causeList: List[CauseItem]
