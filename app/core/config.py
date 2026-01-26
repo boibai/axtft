@@ -41,7 +41,7 @@ ALLOWED_NETWORKS = [
     ipaddress.ip_network(net.strip())
     for net in os.getenv(
         "ALLOWED_NETWORKS",
-        "1.232.105.101"
+        "0.0.0.0"
     ).split(",")
 ]
 

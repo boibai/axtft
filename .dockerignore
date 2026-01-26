@@ -17,3 +17,14 @@ logs/
 
 # model
 /models/
+
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+venv
+node_modules
+.ipynb_checkpoints
