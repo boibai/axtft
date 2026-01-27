@@ -268,8 +268,36 @@ hf download google/gemma-3n-E4B-it --local-dir ./models/gemma-3n-E4B-it
 ### 5-3. vLLM 서빙
 
 ```bash
-# 가상환경 실행
 conda activate axtft
+# Anaconda 가상환경 axtft 활성화
+# → tiktoken, openai_harmony, vLLM 등 패키지가 설치된 환경으로 전환
+
+sudo mkdir -p /etc/encodings
+# tiktoken 인코딩 파일을 저장할 시스템 디렉토리 생성
+# -p 옵션: 이미 존재해도 에러 없이 통과
+
+sudo chmod 755 /etc/encodings
+# encodings 디렉토리 권한 설정
+# root: 쓰기 가능 / 일반 사용자: 읽기 + 실행 가능
+# → vLLM, FastAPI 실행 유저가 인코딩 파일을 읽을 수 있도록 함
+
+cd /etc/encodings
+# tiktoken 인코딩 파일을 다운로드할 디렉토리로 이동
+
+
+sudo curl -O https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken
+sudo curl -O https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken
+# OpenAI API import시 다운로드되는 o200k, cl100k 토크나이저 인코딩 파일 다운로드
+# tiktoken이 온라인 접근 없이 로컬 캐시에서 참조하도록 하기 위함
+
+export TIKTOKEN_ENCODINGS_BASE=/etc/encodings
+# tiktoken이 인코딩 파일을 찾을 기본 경로 지정
+
+export TIKTOKEN_RS_CACHE_DIR=/etc/encodings
+# tiktoken Rust backend의 캐시 디렉토리 지정
+
+source ~/.bashrc
+# export 설정을 즉시 반영
 
 # vllm 서빙 시작
 vllm serve ./models/gpt-oss-20b --served-model-name gpt-oss-20b --max-model-len 8192 --gpu-memory-utilization 0.8 --port 8000 --host 0.0.0.0
