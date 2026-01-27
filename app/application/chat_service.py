@@ -10,7 +10,7 @@ async def handle_chat_request(
     client_port: int | None,
 ):
     request_id = str(uuid.uuid4())[:8]
-    filename = f"{now_kst_str()}_{request_id}.json"
+    filename = f"{now_kst_str()}_{thread_id}.json"
 
     # LangGraph state
     state = {
