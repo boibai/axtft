@@ -4,18 +4,23 @@ from app.langgraph.common.schema import CauseList, Decision
 from app.core.config import VLLM_BASE_URL, MODEL_NAME
 from app.langgraph.common.chat_memory import save_memory
 
-# connect : TCP 연결 수립까지 허용 시간 (서버가 안 살아있거나 네트워크 문제 시 여기서 끊김)
-# read : 서버가 응답 바디를 보내기까지 기다리는 최대 시간 (LLM 추론처럼 오래 걸리는 요청에 중요)
-# write : 요청 바디를 서버로 전송하는 데 허용되는 시간 (큰 JSON / 로그 payload 전송 시)
-# pool : 커넥션 풀에서 사용 가능한 연결을 기다리는 최대 시간 (동시 요청 많을 때 대기 제한)
-# max_connections : # 동시에 열 수 있는 최대 TCP 연결 수 (동시 LLM 요청 상한선)
-# max_keepalive_connections : Keep-Alive로 유지할 연결 수 (자주 호출되는 서버면 높게 유지)
+# 비동기 HTTP 클라이언트 전역 생성 ( 재사용을 통해 커넥션 풀 활용 및 성능 최적화 )
 client = httpx.AsyncClient(
-    timeout=httpx.Timeout(connect=5.0, read=120.0, write=30.0, pool=5.0),
-    limits=httpx.Limits(max_connections=50, max_keepalive_connections=20),
+    timeout=httpx.Timeout(
+        connect=5.0,   # TCP 연결 수립 최대 대기 시간
+        read=120.0,    # 응답 바디 수신 최대 대기 시간 (LLM 추론 고려)
+        write=30.0,    # 요청 바디 전송 최대 시간
+        pool=5.0       # 커넥션 풀에서 대기 가능한 최대 시간
+    ),
+    limits=httpx.Limits(
+        max_connections=50,          # 동시에 열 수 있는 최대 TCP 연결 수
+        max_keepalive_connections=20 # Keep-Alive 유지 연결 수
+    ),
 )
 
+
 async def call_analyze_llm(state: AnalyzeState) -> AnalyzeState:
+
     start = time.perf_counter()
 
     payload = {
@@ -23,6 +28,7 @@ async def call_analyze_llm(state: AnalyzeState) -> AnalyzeState:
         "messages": state["messages"],
         "temperature": 0.0,
         "max_tokens": 4096,
+        # LLM 출력이 반드시 CauseList 스키마를 따르도록 강제
         "response_format": {
             "type": "json_schema",
             "json_schema": {
@@ -41,6 +47,7 @@ async def call_analyze_llm(state: AnalyzeState) -> AnalyzeState:
     state["elapsed_sec"] = round(time.perf_counter() - start, 3)
 
     usage = data.get("usage", {})
+
     state["model_name"] = MODEL_NAME
     state["prompt_tokens"] = usage.get("prompt_tokens")
     state["completion_tokens"] = usage.get("completion_tokens")
@@ -65,6 +72,7 @@ async def call_chat_llm(state: ChatState) -> ChatState:
 
         data = resp.json()
         reply = data["choices"][0]["message"]["content"]
+
         usage = data.get("usage", {})
 
         state.update({
@@ -93,8 +101,8 @@ async def call_chat_llm(state: ChatState) -> ChatState:
             ]
         )
 
-
     except Exception as e:
+
         state.update({
             "reply": None,
             "error": str(e),
@@ -105,14 +113,16 @@ async def call_chat_llm(state: ChatState) -> ChatState:
 
 async def call_decision_llm(messages: list) -> dict:
     """
-    decision 판단 전용 LLM 호출
-    JSON(dict)로 반환
+    검색 필요 여부를 판단하는 decision 전용 LLM 호출 함수
+    JSON(dict) 형태로 결과 반환
     """
+
     payload = {
         "model": MODEL_NAME,
         "messages": messages,
         "temperature": 0.0,
         "max_tokens": 4096,
+
         "response_format": {
             "type": "json_schema",
             "json_schema": {
@@ -121,11 +131,15 @@ async def call_decision_llm(messages: list) -> dict:
             },
         },
     }
+
     resp = await client.post(VLLM_BASE_URL, json=payload)
     resp.raise_for_status()
 
     content = resp.json()["choices"][0]["message"]["content"]
+
     result = json.loads(content)
+
     print(f"- action : {result.get('action')}")
     print(f"- search query : {result.get('search_query')}")
-    return json.loads(content)
+
+    return result
