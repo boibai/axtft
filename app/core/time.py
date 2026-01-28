@@ -1,7 +1,6 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-# 한국시간으로 설정
 kst = ZoneInfo("Asia/Seoul")
 
 def now_kst():
