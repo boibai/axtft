@@ -1,0 +1,350 @@
+[1] WSL ( windows 환경에서 linux를 사용하기 위함 ) - https://blog.naver.com/chcbaram/222525998696 참고
+
+1. 제어판 --> 프로그램 -- 프로그램 및 기능 --> windows 기능 켜기/끄기 --> Linux용 Windows 하위 시스템,  가상 머신 플랫폼 체크 --> 다시 시작
+
+2. Windows Powershell을 관리자 권한으로 실행 ( 아래 명령어 순차 실행 )
+
+# wsl2를 사용하도록 설정
+wsl --set-default-version 2
+
+# 설치 가능한 배포버전 확인
+wsl -l -o
+
+# Ubuntu 24.04 버전으로 설치
+wsl --install -d Ubuntu-24.04
+
+# Unix user account 생성
+
+# linux 실행, 나가기 명령어
+wsl (실행)
+exit (나가기)
+
+# 현재 설치된 배포버전 확인
+wsl -l -v
+
+[2] anaconda 설치 - https://blog.naver.com/asa4209/223393229912 참고
+
+cd /home/{Unix account name}
+
+mkdir installers
+
+cd installers
+
+# anaconda 홈페이지에서 linux용 download link 복사한뒤 실행
+wget https://repo.anaconda.com/archive/Anaconda3-2025.12-1-Linux-x86_64.sh ( wget {복사한 링크} )
+
+bash Anaconda3-2025.12-1-Linux-x86_64.sh ( bash {설치된 파일명} )
+
+중간과정에서 나오는 부분은 전부 yes 입력해주면 됨
+
+exit한뒤에 다시 wsl을 실행하면 (base)문구 뜸
+
+[3] Visual Studio Code 설치
+
+https://code.visualstudio.com/ 홈페이지에서 windows용 vscode 다운로드 후 설치
+
+VS CODE에서 EXTENSIONS 설치 ( python, jupyter, wsl )
+
+ctrl + shift + p -> WSL:Connect to WSL
+
+ctrl + shift + ` -> terminal에 (base)표시되면 완료
+
+[4] GPU Setting
+
+1. GPU 확인
+
+- 장치관리자 > 디스플레이 어댑터 > GeForce RTX 5090 확인
+
+- https://ko.wikipedia.org/wiki/CUDA
+
+- 자신의 GPU에 맞는 컴퓨팅 기능 확인 ( 12.0 )
+
+- 컴퓨팅 기능에 맞는 CUDA SDK 버전 확인 ( 12.8 ~ )
+
+2. CUDA 설치
+
+https://developer.nvidia.com/cuda-toolkit-archive
+
+12.9.0 버전 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo apt-get update
+sudo apt-get -y install cuda-toolkit-12-9
+
+# 접속 후 아래 코드 추가
+vim ~/.bashrc 
+
+#아래의 두 문장을 맨 끝에 입력 후, 저장
+export PATH=/usr/local/cuda-12.9/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-12.9/lib64:$LD_LIBRARY_PATH
+
+# bashrc파일 수정 후, 적용
+source ~/.bashrc
+#CUDA 버전을 바꾸고싶은경우 bashrc만 수정해주면 됨
+
+# CUDA 설치 확인
+nvcc --version
+
+3. cuDNN 설치
+
+https://developer.nvidia.com/rdp/cudnn-archive
+
+맞는 쿠다버전의 최신 cudnn 선택 ( Linux 용 Tar파일 ) 후 다은로드 ( 회원가입 인증이 필요하므로 wget 사용 불가 )
+
+파일 탐색기에서 보면 Linux 탐색기가 있음 여기서 /home/wjhjs/installers 폴더안에 다운로드된 파일 옮겨놓기
+
+tar -xvf cudnn-linux-x86_64-8.9.7.29_cuda12-archive.tar.xz
+sudo cp cudnn-linux-x86_64-8.9.7.29_cuda12-archive/include/cudnn*.h /usr/local/cuda-12.9/include
+sudo cp -P cudnn-linux-x86_64-8.9.7.29_cuda12-archive/lib/libcudnn* /usr/local/cuda-12.9/lib64
+sudo chmod a+r /usr/local/cuda-12.9/lib64/libcudnn*
+
+# cuDNN 설치 확인
+cat /usr/local/cuda/include/cudnn_version.h | grep CUDNN_MAJOR -A 2
+
+[5] vllm 가상환경 설정
+
+conda create -n axtft python=3.12
+
+conda activate axtft
+
+pip install vllm==0.13.0
+pip install timm
+pip install fastapi
+
+[6] hugging face
+
+hf auth login
+
+Add token as git credential? (Y/n) --> n 입력
+
+모델 다운로드 :  hf download {모델명} --local-dir {저장할 경로} )
+
+hf download openai/gpt-oss-20b --local-dir ./models/gpt-oss-20b
+hf download google/gemma-3n-E4B-it --local-dir ./models/gemma-3n-E4B-it
+
+
+[6] Docker 설치
+
+https://docs.docker.com/desktop/setup/install/windows-install/
+
+설치시 아래 두 옵션 체크
+
+Use WSL 2 instead of Hyper-V (또는 WSL2 backend 관련 옵션)
+Add shortcut
+
+Docker Desktop 실행 → Settings
+
+(1) General
+Use WSL 2 based engine ON
+
+(2) Resources → WSL Integration
+Enable integration with my default WSL distro ON
+사용하는 distro(예: Ubuntu) 토글 ON
+
+
+Windows PowerShell 실행후 아래명령어 확인
+
+docker version
+docker run hello-world
+
+WSL(Ubuntu)실행 후 아래 명령어 확인
+
+docker version
+docker run hello-world
+
+
+
+====================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+project 폴더로 이동후 requirements.txt 작성
+
+vllm==0.13.0
+timm==1.0.22
+fastapi==0.127.0
+
+Dockerfile 작성
+
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app /app/app
+# 로그는 컨테이너 외부로
+ENV LOG_DIR=/data/logs
+RUN mkdir -p /data/logs
+
+ENV PYTHONPATH=/app
+
+EXPOSE 9000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000", "--workers", "1", "--loop", "uvloop", "--http", "httptools"]
+
+
+
+# 빌드
+docker build -t axtft-api .
+
+
+방화벽 오픈(Powershell 관리자권한)
+New-NetFirewallRule `
+  -DisplayName "FastAPI Docker 9000" `
+  -Direction Inbound `
+  -Protocol TCP `
+  -LocalPort 9000 `
+  -Action Allow
+
+
+
+
+
+모델 서빙 시작
+vllm serve ./models/gemma-3n-E4B-it --served-model-name gemma-3n-E4B-it --max-model-len 8192 --gpu-memory-utilization 0.8 --port 8000 --host 0.0.0.0
+vllm serve ./models/gpt-oss-20b --served-model-name gpt-oss-20b --max-model-len 8192 --gpu-memory-utilization 0.8 --port 8000 --host 0.0.0.0
+
+도커 시작
+docker run --rm -p 9000:9000 axtft-api
+
+docker run --rm -p 9000:9000 \
+-v /home/wjhjs/projects/models:/models \
+-v /home/wjhjs/projects/logs:/data/logs \
+-e MODEL_NAME=gpt-oss-20b \
+-e ENABLE_IP_WHITELIST=false \
+--name axtft-api axtft-api
+
+docker run --rm -p 9000:9000 \
+-v /home/wjhjs/projects/models:/models \
+-v /home/wjhjs/projects/logs:/data/logs  \
+-e MODEL_NAME=gpt-oss-20b \
+-e ENABLE_IP_WHITELIST=true \
+-e ALLOWED_NETWORKS=1.232.105.71 \
+--name axtft-api axtft-api
+
+
+fast api 시작
+uvicorn app.main:app --host 0.0.0.0 --port 9000 --workers 1 --loop uvloop --http httptools
+uvicorn main:app --host 0.0.0.0 --port 9000 --workers 1 --loop uvloop --http httptools --reload
+
+
+ngrok 등록
+ngrok config add-authtoken {}
+
+
+lsof -i
+
+
+docker system prune -a --volumes
+
+
+git status
+git add .
+git commit -m "initial commit"
+git push -u origin main
+
+git pull origin main
+
+git pull --rebase
+
+git fetch origin
+git reset --hard origin/main
+git clean -fd
+
+
+
+langgraph==1.0.5
+langchain-core==1.2.6
+
+git remote add origin NEW_GIT_URL
+git remote set-url origin NEW_GIT_URL
+
+azure dev ops : https://boibai@dev.azure.com/boibai/CAX-TFT/_git/axtft
+git : https://github.com/boibai/axtft.git
+
+
+
+
+노트북 비밀번호 : axtft1234
+
+vscode 실행
+
+ctrl+shit+`
+
+/home/wjhjs/projects 안에서 3개의 터미널을 열고 차례대로 시작
+s
+
+1. vllm 서버 시작
+
+conda activate axtft
+vllm serve ./models/gpt-oss-20b --served-model-name gpt-oss-20b --max-model-len 8192 --gpu-memory-utilization 0.8 --port 8000 --host 0.0.0.0
+
+2. docker run
+
+docker desktop 실행 ( 바탕화면에 있음 )
+
+docker run --rm -p 9000:9000 \
+-v /home/wjhjs/projects/models:/models \
+-v /home/wjhjs/projects/logs:/data/logs \
+-e MODEL_NAME=gpt-oss-20b \
+-e ENABLE_IP_WHITELIST=false \
+--name axtft-api axtft-api
+
+MODEL_NAME=gpt-oss-20b \
+ENABLE_IP_WHITELIST=false \
+LOG_DIR=/home/axtft/projects/axtft/logs \
+uvicorn app.main:app \
+  --host 0.0.0.0 \
+  --port 9000 \
+  --workers 1 \
+  --loop uvloop \
+  --http httptools
+
+
+"uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000", "--workers", "1", "--loop", "uvloop", "--http", "httptools"
+
+
+3. ngork 시작
+ngrok http 9000
+
+4. Postman
+POST) https://rathe-inez-unabsorbent.ngrok-free.dev/analyze
+
+
+input json
+
+{
+"message": "error_log"
+}
+
+
+output json
+
+{
+"causeList" : [
+	{
+		"causeId" : 1,
+		"title" : ""
+		"cuase" : ""
+		"evidence" : ""
+		"axtionPlan" : ""
+	}
+	]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
