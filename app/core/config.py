@@ -11,11 +11,11 @@ os.makedirs(LOG_DIR, exist_ok=True)
 # Docker 환경에서는 "http://host.docker.internal:8000/v1/chat/completions"
 VLLM_BASE_URL = os.getenv(
     "VLLM_BASE_URL",
-    "http://localhost:8000/v1/chat/completions"
+    "http://10.122.100.173:8000/v1/chat/completions"
 )
 
 # vLLM에서 실제로 사용할 LLM 모델 이름
-MODEL_NAME = os.getenv("MODEL_NAME", "gemma-3n-E4B-it")
+MODEL_NAME = os.getenv("MODEL_NAME", "gpt-oss-20b")
 
 # 로그 분석(analyze) 전용 시스템 프롬프트 파일 경로
 ANALYZE_SYSTEM_PROMPT_PATH = os.getenv(
