@@ -27,7 +27,7 @@ async def call_analyze_llm(state: AnalyzeState) -> AnalyzeState:
         "model": MODEL_NAME,
         "messages": state["messages"],
         "temperature": 0.0,
-        "max_tokens": 4096,
+        "max_tokens": 2048,
         # LLM 출력이 반드시 CauseList 스키마를 따르도록 강제
         "response_format": {
             "type": "json_schema",
