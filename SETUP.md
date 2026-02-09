@@ -310,6 +310,22 @@ vllm serve ./models/gpt-oss-20b --served-model-name gpt-oss-20b --max-model-len 
 # --host 0.0.0.0 : 모든 네트워크 인터페이스에서 접근 허용
 ```
 
+### 6. Redis
+```bash
+sudo apt install redis-server -y
+sudo systemctl enable redis-server
+sudo systemctl start redis-server
+
+/etc/redis/redis.conf
+
+bind 0.0.0.0
+protected-mode yes
+requirepass strongpassword
+
+sudo systemctl restart redis
+```
+
+
 
 
 
