@@ -65,7 +65,11 @@ async def call_chat_llm(state: ChatState) -> ChatState:
         "temperature": 0.0,
         "max_tokens": 4096
     }
-
+    
+    print("\n" + "=" * 20 + " LLM PROMPT START")
+    print(json.dumps(state["messages"], ensure_ascii=False, indent=2))
+    print("=" * 20 + " LLM PROMPT END\n")
+    
     try:
         resp = await client.post(VLLM_BASE_URL, json=payload)
         resp.raise_for_status()
