@@ -1,5 +1,5 @@
 import time, httpx, json
-from app.langgraph.common.state import AnalyzeState, ChatState
+from app.langgraph.common.state import AnalyzeErrorState, ChatState
 from app.langgraph.common.schema import CauseList, Decision
 from app.core.config import VLLM_BASE_URL, MODEL_NAME
 from app.langgraph.common.chat_memory import save_memory
@@ -19,7 +19,7 @@ client = httpx.AsyncClient(
 )
 
 
-async def call_analyze_error_llm(state: AnalyzeState) -> AnalyzeState:
+async def call_analyze_error_llm(state: AnalyzeErrorState) -> AnalyzeErrorState:
 
     start = time.perf_counter()
 

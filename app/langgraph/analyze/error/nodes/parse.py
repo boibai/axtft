@@ -1,7 +1,7 @@
 import json
-from app.langgraph.common.state import AnalyzeState
+from app.langgraph.common.state import AnalyzeErrorState
 
-def parse_json(state: AnalyzeState) -> AnalyzeState:
+def parse_json(state: AnalyzeErrorState) -> AnalyzeErrorState:
 
     try:
         state["parsed_json"] = json.loads(state["llm_content"])

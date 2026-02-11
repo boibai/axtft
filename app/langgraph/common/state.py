@@ -1,6 +1,6 @@
 from typing import TypedDict, Optional, Any, Dict, List, Literal
 
-class AnalyzeState(TypedDict):
+class AnalyzeErrorState(TypedDict):
 
     request_id: str
     message: str

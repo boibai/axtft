@@ -1,7 +1,7 @@
-from app.langgraph.common.state import AnalyzeState
+from app.langgraph.common.state import AnalyzeErrorState
 from app.langgraph.common.schema import CauseList
 
-def validate_schema(state: AnalyzeState) -> AnalyzeState:
+def validate_schema(state: AnalyzeErrorState) -> AnalyzeErrorState:
 
     if state["parsed_json"] is None:
         return state

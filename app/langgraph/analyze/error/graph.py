@@ -1,11 +1,11 @@
 from langgraph.graph import StateGraph, END
-from app.langgraph.common.state import AnalyzeState
+from app.langgraph.common.state import AnalyzeErrorState
 from app.langgraph.common.llm import call_analyze_error_llm
 from app.langgraph.analyze.error.nodes.build_analyze_messages import build_analyze_messages
 from app.langgraph.analyze.error.nodes.parse import parse_json
 from app.langgraph.analyze.error.nodes.validate import validate_schema
 
-graph = StateGraph(AnalyzeState)
+graph = StateGraph(AnalyzeErrorState)
 
 graph.add_node("build_prompt", build_analyze_messages)
 graph.add_node("call_llm", call_analyze_error_llm)
