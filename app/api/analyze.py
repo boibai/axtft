@@ -30,7 +30,7 @@ async def analyze_error(req: ErrorRequest, request: Request):
 # @router.post("/analyze_anomaly")
 # async def analyze_anomaly(req: AnomalyRequest, request: Request):
 
-#     print("\n" + "=" * 20 + " ANOMALY API\n")
+#     print("\n" + "=" * 20 + " ANALYZE ANOMALY API\n")
 #     print(f"- time : {now_kst_str('%Y-%m-%d %H:%M:%S')}")
 
 #     client_ip, client_port = get_client_addr(request)

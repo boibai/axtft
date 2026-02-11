@@ -19,7 +19,7 @@ client = httpx.AsyncClient(
 )
 
 
-async def call_analyze_llm(state: AnalyzeState) -> AnalyzeState:
+async def call_analyze_error_llm(state: AnalyzeState) -> AnalyzeState:
 
     start = time.perf_counter()
 

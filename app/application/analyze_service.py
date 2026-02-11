@@ -1,5 +1,5 @@
 import uuid
-from app.langgraph.analyze.graph import analyze_graph
+from app.langgraph.analyze.error.graph import analyze_graph
 from app.core.logging import write_json_log
 from app.core.time import now_kst, now_kst_str
 
