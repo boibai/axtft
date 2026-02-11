@@ -37,4 +37,5 @@ dist/
 *.egg-info/
 
 app/test.ipynb
+app/company_root_ca.pem
 
