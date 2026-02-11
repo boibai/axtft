@@ -1,7 +1,10 @@
 from pydantic import BaseModel
 from typing import List, Optional, Literal
 
-class AnalyzeRequest(BaseModel):
+class ErrorRequest(BaseModel):
+    message: str
+
+class AnomalyRequest(BaseModel):
     message: str
 
 class CauseItem(BaseModel):

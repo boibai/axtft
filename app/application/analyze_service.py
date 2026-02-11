@@ -3,8 +3,8 @@ from app.langgraph.analyze.graph import analyze_graph
 from app.core.logging import write_json_log
 from app.core.time import now_kst, now_kst_str
 
-# /analyze API에서 전달된 분석 요청을 처리하는 서비스 레이어 함수
-async def handle_analyze_request(
+# /analyze_error API에서 전달된 분석 요청을 처리하는 서비스 레이어 함수
+async def handle_error(
     message: str,
     client_ip: str | None,
     client_port: int | None,
