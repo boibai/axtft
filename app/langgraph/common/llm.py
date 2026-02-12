@@ -2,7 +2,11 @@ import time, httpx, json
 from app.langgraph.common.state import AnalyzeErrorState, ChatState
 from app.langgraph.common.schema import CauseList, Decision
 from app.core.config import VLLM_BASE_URL, MODEL_NAME
-from app.langgraph.common.chat_memory import save_memory
+from app.langgraph.common.chat_memory import ChatMemory
+from app.core.redis import get_redis_client
+
+redis_client = get_redis_client()
+chat_memory = ChatMemory(redis_client)
 
 # 비동기 HTTP 클라이언트 전역 생성 ( 재사용을 통해 커넥션 풀 활용 및 성능 최적화 )
 client = httpx.AsyncClient(
@@ -27,7 +31,7 @@ async def call_analyze_error_llm(state: AnalyzeErrorState) -> AnalyzeErrorState:
         "model": MODEL_NAME,
         "messages": state["messages"],
         "temperature": 0.0,
-        "max_tokens": 2048,
+        "max_tokens": 4096,
         # LLM 출력이 반드시 CauseList 스키마를 따르도록 강제
         "response_format": {
             "type": "json_schema",
@@ -66,10 +70,12 @@ async def call_chat_llm(state: ChatState) -> ChatState:
         "max_tokens": 4096
     }
     
-    print("\n" + "=" * 20 + " LLM PROMPT START")
-    print(json.dumps(state["messages"], ensure_ascii=False, indent=2))
-    print("=" * 20 + " LLM PROMPT END\n")
-    
+    # print("\n" + "=" * 20 + " LLM PROMPT START\n")
+    # for m in state["messages"]:
+    #     m_copy = m.copy()
+    #     print(m_copy["content"])
+    # print("=" * 20 + " LLM PROMPT END\n")
+
     try:
         resp = await client.post(VLLM_BASE_URL, json=payload)
         resp.raise_for_status()
@@ -88,8 +94,8 @@ async def call_chat_llm(state: ChatState) -> ChatState:
             "elapsed_sec": round(time.perf_counter() - start, 3),
             "error": None,
         })
-
-        save_memory(
+        
+        chat_memory.save(
             state["thread_id"],
             [
                 {
@@ -135,14 +141,11 @@ async def call_decision_llm(messages: list) -> dict:
             },
         },
     }
-
     resp = await client.post(VLLM_BASE_URL, json=payload)
     resp.raise_for_status()
-
     content = resp.json()["choices"][0]["message"]["content"]
-
     result = json.loads(content)
-
+    print(content)
     print(f"- action : {result.get('action')}")
     print(f"- search query : {result.get('search_query')}")
 

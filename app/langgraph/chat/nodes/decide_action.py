@@ -12,7 +12,7 @@ async def decide_action(state: ChatState) -> ChatState:
 
     try:
         decision = await call_decision_llm(messages)
-        state["action"] = decision["action"]
+        state["action"] = decision.get("action","direct")
         state["search_query"] = decision.get("search_query")
     except Exception as e :
         state["action"] = "direct"

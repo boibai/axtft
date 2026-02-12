@@ -57,3 +57,6 @@ ALLOWED_NETWORKS = [
 
 # Tavily Search API Key ( 실운영 시에는 반드시 환경 변수로 관리 )
 TAVILY_API_KEY = "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"
+
+# Redis
+REDIS_URL = os.getenv("REDIS_URL", "redis://10.122.100.172:6379/0")
