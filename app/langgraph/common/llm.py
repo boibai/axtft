@@ -131,21 +131,20 @@ async def call_decision_llm(messages: list) -> dict:
         "model": MODEL_NAME,
         "messages": messages,
         "temperature": 0.0,
-        "max_tokens": 4096,
+        "max_tokens": 512,
 
-        "response_format": {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "decision",
-                "schema": Decision.model_json_schema(),
-            },
-        },
+        # "response_format": {
+        #     "type": "json_schema",
+        #     "json_schema": {
+        #         "name": "decision",
+        #         "schema": Decision.model_json_schema(),
+        #     },
+        # },
     }
     resp = await client.post(VLLM_BASE_URL, json=payload)
     resp.raise_for_status()
     content = resp.json()["choices"][0]["message"]["content"]
     result = json.loads(content)
-    print(content)
     print(f"- action : {result.get('action')}")
     print(f"- search query : {result.get('search_query')}")
 

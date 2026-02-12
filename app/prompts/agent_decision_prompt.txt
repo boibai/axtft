@@ -63,6 +63,6 @@ OUTPUT RULES (MANDATORY)
 OUTPUT FORMAT
 --------------------------------
 {
-  "action": "direct" | "search",
+  "action": "direct" or "search",
   "search_query": ""
 }

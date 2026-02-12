@@ -43,6 +43,7 @@ def build_decision_messages(state: ChatState) -> list:
     print("\n"+"="*20+" DECISION NODE START\n")
     history = chat_memory.get(state["thread_id"])
     system_text = decision_system_prompt.safe_substitute()
+    
     return [
         {
             "role": "system",
