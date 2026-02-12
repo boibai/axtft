@@ -1,5 +1,8 @@
 import os
 import ipaddress
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # 로그 파일을 저장할 디렉토리 경로
 LOG_DIR = os.getenv("LOG_DIR", "/data/logs")
@@ -9,13 +12,11 @@ os.makedirs(LOG_DIR, exist_ok=True)
 
 # 로컬 실행 시 기본 주소
 # Docker 환경에서는 "http://host.docker.internal:8000/v1/chat/completions"
-VLLM_BASE_URL = os.getenv(
-    "VLLM_BASE_URL",
-    "http://10.122.100.172:8000/v1/chat/completions"
-)
+VLLM_BASE_URL = os.getenv("VLLM_BASE_URL")
+
 
 # vLLM에서 실제로 사용할 LLM 모델 이름
-MODEL_NAME = os.getenv("MODEL_NAME", "gpt-oss-20b")
+MODEL_NAME = os.getenv("MODEL_NAME")
 
 # 로그 분석(analyze) 전용 시스템 프롬프트 파일 경로
 ANALYZE_SYSTEM_PROMPT_PATH = os.getenv(
@@ -56,7 +57,7 @@ ALLOWED_NETWORKS = [
 ]
 
 # Tavily Search API Key ( 실운영 시에는 반드시 환경 변수로 관리 )
-TAVILY_API_KEY = "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"
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 # Redis
-REDIS_URL = os.getenv("REDIS_URL", "redis://10.122.100.172:6379/0")
+REDIS_URL = os.getenv("REDIS_URL")

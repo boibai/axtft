@@ -10,6 +10,7 @@ venv/
 .env/
 .env.*
 .venv/
+.env
 
 # Conda
 conda-meta/
