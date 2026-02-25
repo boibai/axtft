@@ -14,5 +14,5 @@ REMOTE="$(git rev-parse origin/$BRANCH)"
 if [ "$LOCAL" != "$REMOTE" ]; then
   git reset --hard "origin/$BRANCH"
   git clean -fd
-  sudo systemctl restart "$SERVICE_NAME"
+  systemctl restart "$SERVICE_NAME"
 fi
