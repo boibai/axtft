@@ -6,7 +6,7 @@ from app.core.logging import write_json_log, get_app_logger, get_current_request
 from app.core.time import now_kst, now_kst_str
 from app.langgraph.common.schema import AnalyzeErrorRequest, AnalyzeAnomalyRequest
 
-# test
+# test123123123
 logger = get_app_logger()
 
 
