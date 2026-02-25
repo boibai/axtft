@@ -3,6 +3,8 @@ from app.application.analyze_service import handle_error, handle_anomaly
 from app.utils.network import get_client_addr
 from app.langgraph.common.schema import AnalyzeErrorRequest, AnalyzeAnomalyRequest
 from app.core.time import now_kst_str
+from app.core.logging import get_app_logger
+logger = get_app_logger()
 
 router = APIRouter()
 
@@ -12,9 +14,8 @@ router = APIRouter()
 @router.post("/analyze_error")
 async def analyze_error(req: AnalyzeErrorRequest, request: Request):
 
-    print("\n" + "=" * 20 + " ANALYZE ERROR API\n")
-    print(f"- time : {now_kst_str('%Y-%m-%d %H:%M:%S')}\n")
-
+    logger.info("%s ANALYZE ERROR API START","=" * 20 )
+    
     client_ip, client_port = get_client_addr(request)
 
     return await handle_error(
@@ -30,8 +31,7 @@ async def analyze_error(req: AnalyzeErrorRequest, request: Request):
 @router.post("/analyze_anomaly")
 async def analyze_anomaly(req: AnalyzeAnomalyRequest, request: Request):
 
-    print("\n" + "=" * 20 + " ANALYZE ANOMALY API\n")
-    print(f"- time : {now_kst_str('%Y-%m-%d %H:%M:%S')}")
+    logger.info("%s ANALYZE ANOMALY API START","=" * 20 )
 
     client_ip, client_port = get_client_addr(request)
 

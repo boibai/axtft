@@ -1,19 +1,18 @@
 from app.langgraph.common.state import AnalyzeState
 from app.core.config import ANALYZE_ANOMALY_SYSTEM_PROMPT_PATH
 from app.langgraph.common.utils import truncate_by_tokens, count_tokens, format_logs_as_text
-
+from app.core.logging import get_app_logger
+logger = get_app_logger()
 
 with open(ANALYZE_ANOMALY_SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
     system_prompt = f.read()
 
-
 def build_analyze_messages(state: AnalyzeState) -> AnalyzeState:
-    
     raw_anomaly_logs = format_logs_as_text(state["message"].logs)
     anomaly_log = truncate_by_tokens(raw_anomaly_logs, max_tokens=4096)
     metadata = state["message"]
-
-    print("- SYSTEM_PROMPT_TOKEN :",count_tokens(system_prompt))
+    
+    logger.info("- SYSTEM_PROMPT_TOKEN : %s",count_tokens(system_prompt))
     
     # 메타데이터 필드 추출
     metric_fields = [
@@ -64,6 +63,6 @@ LOG_INPUT_END
         },
     ]
     
-    print("- USER_PROMPT_TOKEN :",count_tokens(user_prompt))
+    logger.info("- USER_PROMPT_TOKEN  : %s",count_tokens(user_prompt))
     
     return state
