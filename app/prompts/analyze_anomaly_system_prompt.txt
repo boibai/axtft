@@ -60,7 +60,7 @@ title:
 
 cause:
 - Korean.
-- 5 to 8 sentences.
+- Max 8 sentences.
 - Must clearly explain the technical mechanism.
 - Explicitly describe the causal chain:
   log pattern → behavior → resource impact → metric degradation.
@@ -74,7 +74,7 @@ evidence:
 
 actionPlan:
 - Max 3 items.
-- Each item 1–2 concise sentences.
+- Each item 1–2 sentences.
 - Provide technically meaningful and production-safe mitigation strategies.
 - Focus on stabilizing the mechanism identified in cause.
 - Avoid low-level implementation details or step-by-step commands.

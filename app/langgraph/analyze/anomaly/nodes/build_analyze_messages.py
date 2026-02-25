@@ -10,8 +10,7 @@ with open(ANALYZE_ANOMALY_SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
 def build_analyze_messages(state: AnalyzeState) -> AnalyzeState:
     
     raw_anomaly_logs = format_logs_as_text(state["message"].logs)
-    anomaly_log = truncate_by_tokens(raw_anomaly_logs, max_tokens=6000)
-    print(len(anomaly_log.split("\n")))
+    anomaly_log = truncate_by_tokens(raw_anomaly_logs, max_tokens=4096)
     metadata = state["message"]
 
     print("- SYSTEM_PROMPT_TOKEN :",count_tokens(system_prompt))

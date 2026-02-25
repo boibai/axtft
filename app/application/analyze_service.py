@@ -40,7 +40,7 @@ async def handle_error(
         "completion_tokens": result.get("completion_tokens"),
         "total_tokens": result.get("total_tokens"),
         "elapsed_sec": result.get("elapsed_sec"),
-        "input_text": message.error.stack_trace,
+        "input_text": message.model_dump(mode="json", exclude_none=True),
         "output_json": result.get("parsed_json"),
         "error_message": result.get("error"),
     }
@@ -49,7 +49,7 @@ async def handle_error(
     print("- TOTAL_TOKEN :",result.get("total_tokens"))
     
     # 분석 결과 및 메타데이터를 JSON 파일로 저장
-    write_json_log(filename, log_data, log_type="analyze")
+    write_json_log(filename, log_data, log_type="analyze/error")
 
     if result.get("error"):
         raise RuntimeError(result["error"])
@@ -82,26 +82,26 @@ async def handle_anomaly(
     # LangGraph 분석 워크플로우 실행 (비동기)
     result = await analyze_anomaly_graph.ainvoke(state)
 
-    # # log로 남길 데이터
-    # log_data = {
-    #     "request_id": request_id,
-    #     "timestamp": now_kst().isoformat(),
-    #     "client_ip": client_ip,
-    #     "client_port": client_port,
-    #     "model_name": result.get("model_name"),
-    #     "prompt_tokens": result.get("prompt_tokens"),
-    #     "completion_tokens": result.get("completion_tokens"),
-    #     "total_tokens": result.get("total_tokens"),
-    #     "elapsed_sec": result.get("elapsed_sec"),
-    #     "input_text": message.error.stack_trace,
-    #     "error_message": result.get("error"),
-    # }
+    # log로 남길 데이터
+    log_data = {
+        "request_id": request_id,
+        "timestamp": now_kst().isoformat(),
+        "client_ip": client_ip,
+        "client_port": client_port,
+        "model_name": result.get("model_name"),
+        "prompt_tokens": result.get("prompt_tokens"),
+        "completion_tokens": result.get("completion_tokens"),
+        "total_tokens": result.get("total_tokens"),
+        "elapsed_sec": result.get("elapsed_sec"),
+        "input_text": message.model_dump(mode="json", exclude_none=True),
+        "error_message": result.get("error"),
+    }
     
     print("- COMPLETION_TOKEN :",result.get("completion_tokens"))
     print("- TOTAL_TOKEN :",result.get("total_tokens"))
 
-    # # 분석 결과 및 메타데이터를 JSON 파일로 저장
-    # write_json_log(filename, log_data, log_type="analyze")
+    # 분석 결과 및 메타데이터를 JSON 파일로 저장
+    write_json_log(filename, log_data, log_type="analyze/anomaly")
     
     if result.get("error"):
         raise RuntimeError(result["error"])
