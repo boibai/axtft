@@ -5,3 +5,4 @@ langgraph==1.0.5
 langchain-core==1.2.6
 langchain-tavily==0.2.16
 redis==7.1.0
+tiktoken==0.12.0

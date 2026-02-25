@@ -1,6 +1,6 @@
 import time, httpx, json
-from app.langgraph.common.state import AnalyzeErrorState, ChatState
-from app.langgraph.common.schema import CauseList, Decision
+from app.langgraph.common.state import AnalyzeState
+from app.langgraph.common.schema import ErrorCauseList, AnomalyCauseList
 from app.core.config import VLLM_BASE_URL, MODEL_NAME
 from app.langgraph.common.chat_memory import ChatMemory
 from app.core.redis import get_redis_client
@@ -23,7 +23,7 @@ client = httpx.AsyncClient(
 )
 
 
-async def call_analyze_error_llm(state: AnalyzeErrorState) -> AnalyzeErrorState:
+async def call_analyze_error_llm(state: AnalyzeState) -> AnalyzeState:
 
     start = time.perf_counter()
 
@@ -37,7 +37,7 @@ async def call_analyze_error_llm(state: AnalyzeErrorState) -> AnalyzeErrorState:
             "type": "json_schema",
             "json_schema": {
                 "name": "cause-list",
-                "schema": CauseList.model_json_schema(),
+                "schema": ErrorCauseList.model_json_schema(),
             },
         },
     }
@@ -59,7 +59,8 @@ async def call_analyze_error_llm(state: AnalyzeErrorState) -> AnalyzeErrorState:
 
     return state
 
-async def call_chat_llm(state: ChatState) -> ChatState:
+
+async def call_analyze_anomaly_llm(state: AnalyzeState) -> AnalyzeState:
 
     start = time.perf_counter()
 
@@ -67,85 +68,30 @@ async def call_chat_llm(state: ChatState) -> ChatState:
         "model": MODEL_NAME,
         "messages": state["messages"],
         "temperature": 0.0,
-        "max_tokens": 4096
+        "max_tokens": 4096,
+        # LLM 출력이 반드시 CauseList 스키마를 따르도록 강제
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "cause-list",
+                "schema": AnomalyCauseList.model_json_schema(),
+            },
+        },
     }
-    
-    # print("\n" + "=" * 20 + " LLM PROMPT START\n")
-    # for m in state["messages"]:
-    #     m_copy = m.copy()
-    #     print(m_copy["content"])
-    # print("=" * 20 + " LLM PROMPT END\n")
 
-    try:
-        resp = await client.post(VLLM_BASE_URL, json=payload)
-        resp.raise_for_status()
-
-        data = resp.json()
-        reply = data["choices"][0]["message"]["content"]
-
-        usage = data.get("usage", {})
-
-        state.update({
-            "reply": reply,
-            "model_name": MODEL_NAME,
-            "prompt_tokens": usage.get("prompt_tokens"),
-            "completion_tokens": usage.get("completion_tokens"),
-            "total_tokens": usage.get("total_tokens"),
-            "elapsed_sec": round(time.perf_counter() - start, 3),
-            "error": None,
-        })
-        
-        chat_memory.save(
-            state["thread_id"],
-            [
-                {
-                    "role": "user",
-                    "content": state["message"],
-                    "type": "final"
-                },
-                {
-                    "role": "assistant",
-                    "content": reply,
-                    "type": "final"
-                }
-            ]
-        )
-
-    except Exception as e:
-
-        state.update({
-            "reply": None,
-            "error": str(e),
-            "elapsed_sec": round(time.perf_counter() - start, 3),
-        })
-
-    return state
-
-async def call_decision_llm(messages: list) -> dict:
-    """
-    검색 필요 여부를 판단하는 decision 전용 LLM 호출 함수
-    JSON(dict) 형태로 결과 반환
-    """
-
-    payload = {
-        "model": MODEL_NAME,
-        "messages": messages,
-        "temperature": 0.0,
-        "max_tokens": 512,
-
-        # "response_format": {
-        #     "type": "json_schema",
-        #     "json_schema": {
-        #         "name": "decision",
-        #         "schema": Decision.model_json_schema(),
-        #     },
-        # },
-    }
     resp = await client.post(VLLM_BASE_URL, json=payload)
     resp.raise_for_status()
-    content = resp.json()["choices"][0]["message"]["content"]
-    result = json.loads(content)
-    print(f"- action : {result.get('action')}")
-    print(f"- search query : {result.get('search_query')}")
 
-    return result
+    data = resp.json()
+
+    state["llm_content"] = data["choices"][0]["message"]["content"]
+    state["elapsed_sec"] = round(time.perf_counter() - start, 3)
+
+    usage = data.get("usage", {})
+
+    state["model_name"] = MODEL_NAME
+    state["prompt_tokens"] = usage.get("prompt_tokens")
+    state["completion_tokens"] = usage.get("completion_tokens")
+    state["total_tokens"] = usage.get("total_tokens")
+
+    return state

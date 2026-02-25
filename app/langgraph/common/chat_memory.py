@@ -1,9 +1,6 @@
-# app/langgraph/common/chat_memory.py
-
 from typing import List
 import json
 import re
-
 
 class ChatMemory:
 

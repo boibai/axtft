@@ -1,18 +1,17 @@
 from app.langgraph.common.state import AnalyzeState
-from app.core.config import ANALYZE_ERROR_SYSTEM_PROMPT_PATH
-from app.langgraph.common.utils import truncate_by_tokens, count_tokens
+from app.core.config import ANALYZE_ANOMALY_SYSTEM_PROMPT_PATH
+from app.langgraph.common.utils import truncate_by_tokens, count_tokens, format_logs_as_text
 
 
-with open(ANALYZE_ERROR_SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
+with open(ANALYZE_ANOMALY_SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
     system_prompt = f.read()
 
 
 def build_analyze_messages(state: AnalyzeState) -> AnalyzeState:
-
-    raw_error_log = state["message"].error.stack_trace
     
-    error_log = truncate_by_tokens(raw_error_log, max_tokens=2048)
-    
+    raw_anomaly_logs = format_logs_as_text(state["message"].logs)
+    anomaly_log = truncate_by_tokens(raw_anomaly_logs, max_tokens=6000)
+    print(len(anomaly_log.split("\n")))
     metadata = state["message"]
 
     print("- SYSTEM_PROMPT_TOKEN :",count_tokens(system_prompt))
@@ -40,18 +39,21 @@ def build_analyze_messages(state: AnalyzeState) -> AnalyzeState:
     metrics_block = ""
     if metrics_text_lines:
         metrics_block = (
-            "\n\nSYSTEM_METADATA_START\n"
+            "\nSYSTEM_METADATA_START\n\n"
             + "\n".join(metrics_text_lines)
-            + "\nSYSTEM_METADATA_END"
+            + "\n\nSYSTEM_METADATA_END\n\n"
         )
 
     user_prompt = f"""Analyze the following information.
-LOG_INPUT_START
-{error_log}
-LOG_INPUT_END
 {metrics_block}
+LOG_INPUT_START
+
+{anomaly_log}
+
+LOG_INPUT_END
 """
     
+    # print(user_prompt)
     state["messages"] = [
         {
             "role": "system",

@@ -1,5 +1,5 @@
 from app.langgraph.common.state import AnalyzeState
-from app.langgraph.common.schema import ErrorCauseList
+from app.langgraph.common.schema import AnomalyCauseList
 
 def validate_schema(state: AnalyzeState) -> AnalyzeState:
     
@@ -7,7 +7,7 @@ def validate_schema(state: AnalyzeState) -> AnalyzeState:
         return state
 
     try:
-        ErrorCauseList.model_validate(state["parsed_json"])
+        AnomalyCauseList.model_validate(state["parsed_json"])
         state["error"] = None
 
     except Exception as e:
