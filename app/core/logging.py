@@ -1,6 +1,9 @@
 import json, os
-from typing import Dict
+from typing import Dict, Optional
 from app.core.config import LOG_DIR
+import logging
+from contextvars import ContextVar
+from datetime import datetime
 
 # JSON 로그 파일을 디스크에 저장하는 공통 유틸 함수
 def write_json_log(
@@ -16,12 +19,6 @@ def write_json_log(
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
         
-# app/core/request_logger.py
-import logging
-import os
-from contextvars import ContextVar
-from datetime import datetime
-from typing import Optional
 
 # 요청 단위로 request_id / log_file_path를 어디서든 꺼내 쓸 수 있게 함 (async-safe)
 request_id_var: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
