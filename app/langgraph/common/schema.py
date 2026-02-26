@@ -1,6 +1,8 @@
 from pydantic import BaseModel, BaseModel, Field, ConfigDict
 from typing import List, Optional, Literal, Dict, Any
+from datetime import datetime
 
+from pydantic import BaseModel, ConfigDict, Field
 class LogInfo(BaseModel):
     level: str
     logger: str
@@ -25,6 +27,20 @@ class ErrorInfo(BaseModel):
     type: str
     message: Optional[str] = None
     stack_trace: str
+
+class MetricPoint(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    timestamp: datetime = Field(alias='@timestamp')
+    http_error_rate: float
+    latency_p95: int
+    latency_p99: int
+    service_status: Literal[0, 1]
+    cpu_usage: float
+    memory_usage: float
+    throughput: float
+    db_connection_pool: int
+    disk_usage: float
 
 class LogEntry(BaseModel):
     timestamp: str = Field(alias='@timestamp')
@@ -63,18 +79,9 @@ class AnalyzeErrorRequest(BaseModel):
 class AnalyzeAnomalyRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid")  # allow, ignore
+    metrics: List[MetricPoint] = Field(default_factory=list)
+    logs: List[LogEntry] = Field(default_factory=list)
     
-    http_error_rate: float
-    latency_p95: float
-    latency_p99: float
-    service_status: int
-    cpu_usage: float
-    memory_usage: float
-    throughput: float
-    db_connection_pool: int
-    disk_usage: float
-    logs: List[LogEntry]
-
 class ErrorCauseItem(BaseModel):
     causeId: int
     title: str
