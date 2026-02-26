@@ -17,11 +17,11 @@ def _is_retryable_error(exc: Exception) -> bool:
         return True
 
     retry_signals = [
-        "JSON parse failed",
-        "must be str, bytes or bytearray, not NoneType",
-        "LLM returned empty",
-        "empty content",
-        "Expecting value",
+        # "JSON parse failed",
+        # "must be str, bytes or bytearray, not NoneType",
+        # "LLM returned empty",
+        # "empty content",
+        # "Expecting value",
     ]
     if any(s in msg for s in retry_signals):
         return True
