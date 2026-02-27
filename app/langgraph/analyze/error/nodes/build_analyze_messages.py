@@ -7,12 +7,11 @@ logger = get_app_logger()
 with open(ANALYZE_ERROR_SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
     system_prompt = f.read()
 
-
 def build_analyze_messages(state: AnalyzeState) -> AnalyzeState:
 
     raw_error_log = state["message"].error.stack_trace
     
-    error_log = truncate_by_tokens(raw_error_log, max_tokens=2048)
+    error_log = truncate_by_tokens(raw_error_log, max_tokens=4096)
     
     metadata = state["message"]
 

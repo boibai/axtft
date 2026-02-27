@@ -101,4 +101,5 @@ class AnomalyCauseItem(BaseModel):
     actionPlan: List[str]
 
 class AnomalyCauseList(BaseModel):
+    riskLevel: Literal["LOW", "MEDIUM", "HIGH"]
     causeList: List[AnomalyCauseItem]

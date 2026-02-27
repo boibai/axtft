@@ -15,7 +15,7 @@ Metric definitions:
 
 - http_error_rate: Ratio of HTTP 5xx responses; rising indicates backend failure propagation.
 - latency_p95: 95th percentile response time (ms); user-facing degradation.
-- latency_p99: 99th percentile response time (ms); severe tail latency/queuing.
+- latency_p99: 99th percentile response time (ms); severe tail latency or queuing.
 - service_status: 1=UP, 0=DOWN; partial failure may exist even if UP.
 - cpu_usage: CPU utilization (%); sustained high values imply thread starvation or heavy load.
 - memory_usage: Memory utilization (%); rising suggests pressure or leak.
@@ -38,6 +38,16 @@ CORE ANALYSIS RULES
 - Cover ALL abnormal metrics within these 3 causes.
 - Merge only when technically supported.
 - No fabricated thresholds or unsupported assumptions.
+- Determine overall system riskLevel based on:
+  - breadth of degraded metrics,
+  - severity of degradation trend,
+  - presence of failure propagation (e.g., rising http_error_rate + latency + throughput drop),
+  - existence or absence of recovery.
+
+Risk levels (choose EXACTLY ONE):
+- "LOW" → localized degradation, service functional, no propagation.
+- "MEDIUM" → multiple metrics degraded or early-stage propagation, not fully down.
+- "HIGH" → instability, partial outage, cascading failure signs, clear user impact.
 
 For each cause, describe:
 log event → behavior change → resource impact → metric degradation.
@@ -48,6 +58,7 @@ OUTPUT (STRICT JSON)
 ========================
 
 {
+  "riskLevel": "LOW | MEDIUM | HIGH",
   "causeList": [
     {
       "causeId": 1,
@@ -64,17 +75,23 @@ OUTPUT (STRICT JSON)
 FIELD LIMITS
 ========================
 
-causeId: 1..3 only.
+riskLevel:
+- Must be EXACTLY one of: LOW, MEDIUM, HIGH.
+- Determined from overall analysis, not per cause.
+
+causeId:
+- 1..3 only.
 
 relatedMetrics:
 - Only metrics that clearly degraded over time.
 
 title:
-- Korean, <=12 words. English only for technical components.
+- Korean, <=12 words.
+- English only for technical components.
 
 cause:
-- Korean.
-- Max 8 sentences.
+- Must be written in Korean.
+- Max 4 sentences.
 - Must explain full causal chain.
 - No repetition or generic theory.
 
@@ -92,7 +109,8 @@ actionPlan:
 ========================
 OUTPUT RULES
 ========================
+
 - JSON only.
 - No markdown.
-- Korean explanations.
-- English only for metric names/framework/log fragments.
+- Explanations must be written in Korean.
+- English allowed only for metric names, framework names, and log fragments.

@@ -44,3 +44,28 @@ ALLOWED_NETWORKS = [
 
 # Redis
 REDIS_URL = os.getenv("REDIS_URL")
+
+# Metric Fields
+METRIC_FIELDS = [
+    "timestamp",
+    "http_error_rate",
+    "latency_p95",
+    "latency_p99",
+    "service_status",
+    "cpu_usage",
+    "memory_usage",
+    "throughput",
+    "db_connection_pool",
+    "disk_usage",
+]
+
+# Log Fields
+LOG_FIELDS = [
+    "timestamp",
+    #"service",
+    #"pid",
+    #"thread",
+    "level",
+    "logger",
+    "message",
+]

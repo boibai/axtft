@@ -1,4 +1,4 @@
-import uuid ,asyncio, httpx, logging
+import uuid ,asyncio, httpx, logging, json
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception, before_sleep_log
 from app.langgraph.analyze.error.graph import analyze_error_graph
 from app.langgraph.analyze.anomaly.graph import analyze_anomaly_graph
@@ -183,6 +183,10 @@ async def handle_anomaly(
     }
 
     logger.info("- COMPLETION_TOKEN : %s", result.get("completion_tokens"))
+    logger.info(
+        "- OUTPUT:\n%s",
+        json.dumps(result["parsed_json"], indent=2, ensure_ascii=False)
+    )
     logger.info("- TOTAL_TOKEN : %s", result.get("total_tokens"))
     logger.info("%s END API","="*20)
     write_json_log(filename, log_data, log_type="analyze/anomaly")
