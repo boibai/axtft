@@ -21,7 +21,7 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 # 로그 분석(analyze) 전용 시스템 프롬프트 파일 경로
 ANALYZE_ERROR_SYSTEM_PROMPT_PATH = os.getenv(
     "SYSTEM_PROMPT_PATH",
-    "./app/prompts/analyze_error_system_prompt.txt"
+    "./app/prompts/analyze_error_message_system_prompt.txt"
 )
 
 ANALYZE_ANOMALY_SYSTEM_PROMPT_PATH = os.getenv(

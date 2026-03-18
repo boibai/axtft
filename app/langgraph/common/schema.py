@@ -75,7 +75,12 @@ class AnalyzeErrorRequest(BaseModel):
     disk_usage: float
 
     error: ErrorInfo
-    
+
+class AnalyzeErrorMessageRequest(BaseModel):
+
+    model_config = ConfigDict(extra="forbid")  # allow, ignore
+    message: str
+
 class AnalyzeAnomalyRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid")  # allow, ignore
