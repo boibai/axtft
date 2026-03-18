@@ -36,7 +36,6 @@ async def run_interval_report() -> dict[str, Any]:
 
     logs = fetch_logs(now=now, start_time=start_time, end_time=end_time)
     log_llm_input = build_log_llm_input(logs)
-    print(log_llm_input)
 
     queries = build_metric_queries()
     metric_names = list(queries.keys())

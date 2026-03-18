@@ -6,6 +6,8 @@ from collections import defaultdict
 from app.core.config import (
     LOG_SERVER,
     METRIC_SERVER,
+    ELS_PW
+    ELS_ID
 )
 
 kst = timezone(timedelta(hours=9))
@@ -276,11 +278,10 @@ def fetch_logs(
         url,
         headers={"Content-Type": "application/json"},
         json=build_log_query(),
-        auth=HTTPBasicAuth("elastic", "caxtft2026*"),
+        auth=HTTPBasicAuth(ELS_ID, ELS_PW),
         timeout=30,
     )
     response.raise_for_status()
-
     response_data = response.json()
     hits = response_data.get("hits", {}).get("hits", [])
 

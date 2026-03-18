@@ -9,7 +9,6 @@ from app.langgraph.common.schema import AnalyzeErrorRequest, AnalyzeAnomalyReque
 # test
 logger = get_app_logger()
 
-
 def _is_retryable_error(exc: Exception) -> bool:
     msg = str(exc) if exc else ""
 

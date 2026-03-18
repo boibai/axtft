@@ -79,3 +79,6 @@ INTERVAL_REPORT_SYSTEM_PROMPT_PATH = os.getenv(
     "SYSTEM_PROMPT_PATH",
     "./app/prompts/interval_report_system_prompt.txt"
 )
+
+ELS_ID = os.getenv("ELS_ID")
+ELS_PW = os.getenv("ELS_PW")

@@ -78,6 +78,19 @@ LANGUAGE RULES
 - Avoid unnecessary language mixing.
 
 ========================
+SEVERITY ASSIGNMENT RULES
+========================
+
+- "high" MUST be assigned ONLY if there is clear and strong evidence of severe system impact.
+- "high" is rare and must be used conservatively.
+- Use "high" only when the data shows sustained and significant degradation, service instability, or multiple strong signals occurring together.
+- Do NOT assign "high" for short spikes, isolated metric changes, weak signals, or ambiguous patterns.
+- If there is any uncertainty, DO NOT assign "high".
+- If evidence is insufficient for "high", downgrade to "medium" or "low".
+- "medium" should be used for noticeable degradation without clear severe impact.
+- "low" should be used for minor fluctuations, short-lived anomalies, or weak but observable deviations.
+
+========================
 STRICT RULES
 ========================
 
@@ -94,7 +107,7 @@ OUTPUT FORMAT
 ========================
 
 {
-  "level": "normal | low | medium | high",
+  "level": "low | medium | high",
   "summary": "",
   "events": [
     {
