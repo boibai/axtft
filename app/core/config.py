@@ -7,12 +7,13 @@ load_dotenv()
 # 로그 파일을 저장할 디렉토리 경로
 LOG_DIR = os.getenv("LOG_DIR", "/data/logs")
 
-# 로그 디렉토리가 존재하지 않으면 자동 생성
-os.makedirs(LOG_DIR, exist_ok=True)
+# # 로그 디렉토리가 존재하지 않으면 자동 생성
+# os.makedirs(LOG_DIR, exist_ok=True)
 
 # 로컬 실행 시 기본 주소
 # Docker 환경에서는 "http://host.docker.internal:8000/v1/chat/completions"
 VLLM_BASE_URL = os.getenv("VLLM_BASE_URL")
+VLLM_BASE_URL2 = os.getenv("VLLM_BASE_URL2")
 
 # vLLM에서 실제로 사용할 LLM 모델 이름
 MODEL_NAME = os.getenv("MODEL_NAME")
@@ -69,3 +70,12 @@ LOG_FIELDS = [
     "logger",
     "message",
 ]
+
+# Log Server
+LOG_SERVER = os.getenv("LOG_SERVER")
+METRIC_SERVER = os.getenv("METRIC_SERVER")
+
+INTERVAL_REPORT_SYSTEM_PROMPT_PATH = os.getenv(
+    "SYSTEM_PROMPT_PATH",
+    "./app/prompts/interval_report_system_prompt.txt"
+)

@@ -1,9 +1,10 @@
 import time, httpx, json
 from app.langgraph.common.state import AnalyzeState
 from app.langgraph.common.schema import ErrorCauseList, AnomalyCauseList
-from app.core.config import VLLM_BASE_URL, MODEL_NAME
+from app.core.config import VLLM_BASE_URL, MODEL_NAME, VLLM_BASE_URL2
 from app.langgraph.common.chat_memory import ChatMemory
 from app.core.redis import get_redis_client
+from app.report.schema import TenMinuteSummaryReport
 
 redis_client = get_redis_client()
 chat_memory = ChatMemory(redis_client)
@@ -95,3 +96,32 @@ async def call_analyze_anomaly_llm(state: AnalyzeState) -> AnalyzeState:
     state["total_tokens"] = usage.get("total_tokens")
 
     return state
+
+
+async def call_report_llm(prompt: list) :
+
+    start = time.perf_counter()
+
+    payload = {
+        "model": MODEL_NAME,
+        "messages": prompt,
+        "temperature": 0.0,
+        "max_tokens": 4096,
+        # LLM 출력이 반드시 CauseList 스키마를 따르도록 강제
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "cause-list",
+                "schema": TenMinuteSummaryReport.model_json_schema(),
+            },
+        },
+    }
+
+    resp = await client.post(VLLM_BASE_URL2, json=payload)
+    resp.raise_for_status()
+
+    data = resp.json()
+
+    result = json.loads(data["choices"][0]["message"]["content"])
+
+    return result
