@@ -24,6 +24,7 @@ from app.report.utils import (
 from app.core.config import (
     INTERVAL_REPORT_SYSTEM_PROMPT_PATH,
 )
+from app.langgraph.common.utils import truncate_by_tokens
 
 kst = timezone(timedelta(hours=9))
 
@@ -36,7 +37,7 @@ async def run_interval_report() -> dict[str, Any]:
 
     logs = fetch_logs(now=now, start_time=start_time, end_time=end_time)
     log_llm_input = build_log_llm_input(logs)
-
+    
     queries = build_metric_queries()
     metric_names = list(queries.keys())
 
@@ -68,8 +69,9 @@ async def run_interval_report() -> dict[str, Any]:
     system_prompt = load_system_prompt(INTERVAL_REPORT_SYSTEM_PROMPT_PATH)
     user_prompt = build_user_prompt(
         metric_llm_input=metric_llm_input,
-        log_llm_input=log_llm_input,
+        log_llm_input=truncate_by_tokens(log_llm_input, max_tokens=4096),
     )
+    
     messages = build_chat_messages(system_prompt, user_prompt)
 
     result = await call_report_llm(messages)
