@@ -6,7 +6,7 @@ from collections import defaultdict
 from app.core.config import (
     LOG_SERVER,
     METRIC_SERVER,
-    ELS_PW
+    ELS_PW,
     ELS_ID
 )
 
