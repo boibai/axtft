@@ -6,12 +6,11 @@ from app.core.time import now_kst_str
 from app.core.logging import get_app_logger
 logger = get_app_logger()
 
-router = APIRouter()
-
+router = APIRouter(prefix="/analyze")
 # ===============================
 # 사후 분석
 # ===============================
-@router.post("/analyze_error")
+@router.post("/error")
 async def analyze_error(req: AnalyzeErrorRequest, request: Request):
 
     logger.info("%s ANALYZE ERROR API START","=" * 20 )
@@ -28,7 +27,7 @@ async def analyze_error(req: AnalyzeErrorRequest, request: Request):
 # ===============================
 # 사전 분석
 # ===============================
-@router.post("/analyze_anomaly")
+@router.post("/anomaly")
 async def analyze_anomaly(req: AnalyzeAnomalyRequest, request: Request):
 
     logger.info("%s ANALYZE ANOMALY API START","=" * 20 )

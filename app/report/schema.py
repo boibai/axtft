@@ -12,3 +12,11 @@ class TenMinuteSummaryReport(BaseModel):
     level: Literal["low", "medium", "high"]
     summary: str
     events: List[EventSummary]
+
+
+class IntervalReportRequest(BaseModel):
+    date: str
+    
+class IntervalReportFileRequest(BaseModel):
+    date: str
+    filename: str

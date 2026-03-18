@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from app.api.analyze import router as analyze_router
+from app.api.report import router as report_router
 from app.middleware.ip_whitelist import ip_whitelist_middleware
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.logging import get_app_logger, start_request_file_logging, stop_request_file_logging
@@ -39,3 +40,4 @@ app.add_middleware(
 )
 
 app.include_router(analyze_router)
+app.include_router(report_router)
