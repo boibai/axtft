@@ -14,10 +14,6 @@ class ChatMemory:
         self.max_tokens = max_memory_tokens
         self.chars_per_token = chars_per_token
 
-    # ===============================
-    # 내부 유틸
-    # ===============================
-
     def _redis_key(self, thread_id: str) -> str:
         return f"chat:memory:{thread_id}"
 
@@ -34,9 +30,6 @@ class ChatMemory:
         )
         return re.sub(pattern, "", text).strip()
 
-    # ===============================
-    # 공개 메서드
-    # ===============================
 
     def get(self, thread_id: str) -> List[dict]:
         raw = self.redis.get(self._redis_key(thread_id))
@@ -69,7 +62,6 @@ class ChatMemory:
 
         merged = prev + filtered
 
-        # sliding window (토큰 기준)
         while merged and self._total_tokens(merged) > self.max_tokens:
             merged.pop(0)
 

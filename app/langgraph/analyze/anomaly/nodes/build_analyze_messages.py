@@ -11,11 +11,6 @@ with open(ANALYZE_ANOMALY_SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
 def build_analyze_messages(state: AnalyzeState) -> AnalyzeState:
     raw_anomaly_logs = format_logs_as_table(state["message"].logs)
     anomaly_log = truncate_by_tokens(raw_anomaly_logs, max_tokens=4096)
-
-    # logger.info(
-    #     "- INPUT:\n%s",
-    #     state["message"].model_dump_json(indent=2, ensure_ascii=False)
-    # )
     metadata = state["message"].metrics
     
     logger.info("- SYSTEM_PROMPT_TOKEN : %s",count_tokens(system_prompt))

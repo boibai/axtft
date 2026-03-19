@@ -76,6 +76,7 @@ class AnalyzeErrorRequest(BaseModel):
 
     error: ErrorInfo
 
+## 임시
 class AnalyzeErrorMessageRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid")  # allow, ignore

@@ -1,7 +1,7 @@
 import json
 import os, re
 from typing import Any
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
 from app.core.config import DATA_DIR
 from app.report.schema import IntervalReportRequest, IntervalReportFileRequest
 from app.core.logging import get_app_logger

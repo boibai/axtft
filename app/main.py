@@ -1,4 +1,4 @@
-import os
+import os, uuid
 from fastapi import FastAPI, Request
 from app.api.analyze import router as analyze_router
 from app.api.report import router as report_router
@@ -21,11 +21,9 @@ def resolve_request_log_dir(path: str) -> str:
 
 @app.middleware("http")
 async def request_file_logger_middleware(request: Request, call_next):
-    # request_id를 헤더로 받거나, 없으면 생성
+
     rid = request.headers.get("x-request-id")
     if not rid:
-        # uuid를 여기서 만들어도 되고, 기존처럼 service에서 만들어도 됨
-        import uuid
         rid = str(uuid.uuid4())[:8]
         
     log_dir = resolve_request_log_dir(request.url.path)

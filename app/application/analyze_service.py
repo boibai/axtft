@@ -6,7 +6,6 @@ from app.core.logging import write_json_data, get_app_logger, get_current_reques
 from app.core.time import now_kst, now_kst_str
 from app.langgraph.common.schema import AnalyzeErrorRequest, AnalyzeAnomalyRequest, AnalyzeErrorMessageRequest
 
-# test
 logger = get_app_logger()
 
 def _is_retryable_error(exc: Exception) -> bool:
@@ -16,11 +15,6 @@ def _is_retryable_error(exc: Exception) -> bool:
         return True
 
     retry_signals = [
-        # "JSON parse failed",
-        # "must be str, bytes or bytearray, not NoneType",
-        # "LLM returned empty",
-        # "empty content",
-        # "Expecting value",
     ]
     if any(s in msg for s in retry_signals):
         return True
@@ -193,7 +187,7 @@ async def handle_anomaly(
 
 
 
-
+## 임시
 async def handle_error2(
     message: AnalyzeErrorMessageRequest,
     client_ip: str | None,
