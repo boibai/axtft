@@ -2,7 +2,7 @@ import uuid ,asyncio, httpx, logging, json
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception, before_sleep_log
 from app.langgraph.analyze.error.graph import analyze_error_graph
 from app.langgraph.analyze.anomaly.graph import analyze_anomaly_graph
-from app.core.logging import write_json_log, get_app_logger, get_current_request_id
+from app.core.logging import write_json_data, get_app_logger, get_current_request_id
 from app.core.time import now_kst, now_kst_str
 from app.langgraph.common.schema import AnalyzeErrorRequest, AnalyzeAnomalyRequest, AnalyzeErrorMessageRequest
 
@@ -88,7 +88,7 @@ async def handle_error(
     try:
         result = await _run_error_graph_with_retry(state)
     except Exception as e:
-        log_data = {
+        data = {
             "request_id": request_id,
             "timestamp": now_kst().isoformat(),
             "client_ip": client_ip,
@@ -102,10 +102,10 @@ async def handle_error(
             "output_json": None,
             "error_message": str(e),
         }
-        write_json_log(filename, log_data, log_type="analyze/error")
+        write_json_data(filename, data, data_type="analyze/error")
         raise
 
-    log_data = {
+    data = {
         "request_id": request_id,
         "timestamp": now_kst().isoformat(),
         "client_ip": client_ip,
@@ -123,7 +123,7 @@ async def handle_error(
     logger.info("- COMPLETION_TOKEN : %s", result.get("completion_tokens"))
     logger.info("- TOTAL_TOKEN : %s", result.get("total_tokens"))
     logger.info("%s END API","="*20)
-    write_json_log(filename, log_data, log_type="analyze/error")
+    write_json_data(filename, data, data_type="analyze/error")
     return result["parsed_json"]
 
 
@@ -149,7 +149,7 @@ async def handle_anomaly(
     try:
         result = await _run_anomaly_graph_with_retry(state)
     except Exception as e:
-        log_data = {
+        data = {
             "request_id": request_id,
             "timestamp": now_kst().isoformat(),
             "client_ip": client_ip,
@@ -163,10 +163,10 @@ async def handle_anomaly(
             "output_json": None,
             "error_message": str(e),
         }
-        write_json_log(filename, log_data, log_type="analyze/anomaly")
+        write_json_data(filename, data, data_type="analyze/anomaly")
         raise
 
-    log_data = {
+    data = {
         "request_id": request_id,
         "timestamp": now_kst().isoformat(),
         "client_ip": client_ip,
@@ -188,7 +188,7 @@ async def handle_anomaly(
     )
     logger.info("- TOTAL_TOKEN : %s", result.get("total_tokens"))
     logger.info("%s END API","="*20)
-    write_json_log(filename, log_data, log_type="analyze/anomaly")
+    write_json_data(filename, data, data_type="analyze/anomaly")
     return result["parsed_json"]
 
 
@@ -217,7 +217,7 @@ async def handle_error2(
     try:
         result = await _run_error_graph_with_retry(state)
     except Exception as e:
-        log_data = {
+        data = {
             "request_id": request_id,
             "timestamp": now_kst().isoformat(),
             "client_ip": client_ip,
@@ -231,10 +231,10 @@ async def handle_error2(
             "output_json": None,
             "error_message": str(e),
         }
-        write_json_log(filename, log_data, log_type="analyze/error")
+        write_json_data(filename, data, data_type="analyze/error")
         raise
 
-    log_data = {
+    data = {
         "request_id": request_id,
         "timestamp": now_kst().isoformat(),
         "client_ip": client_ip,
@@ -252,5 +252,5 @@ async def handle_error2(
     logger.info("- COMPLETION_TOKEN : %s", result.get("completion_tokens"))
     logger.info("- TOTAL_TOKEN : %s", result.get("total_tokens"))
     logger.info("%s END API","="*20)
-    write_json_log(filename, log_data, log_type="analyze/error")
+    write_json_data(filename, data, data_type="analyze/error")
     return result["parsed_json"]

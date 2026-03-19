@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timedelta, timezone
 from typing import Any
 from app.langgraph.common.llm import call_report_llm
+from app.langgraph.common.utils import truncate_by_tokens
 from app.report.utils import (
     get_last_15min_window,
     fetch_logs,
@@ -20,16 +21,18 @@ from app.report.utils import (
 from app.core.config import (
     INTERVAL_REPORT_SYSTEM_PROMPT_PATH,
 )
-from app.langgraph.common.utils import truncate_by_tokens
+from app.core.logging import get_interval_logger
 
 kst = timezone(timedelta(hours=9))
+now = datetime.now(kst)
+start_time, end_time = get_last_15min_window(now)
+
+logger = get_interval_logger(start_time, end_time, log_type="interval")
 
 async def run_interval_report() -> dict[str, Any]:
-    now = datetime.now(kst)
-    start_time, end_time = get_last_15min_window(now)
 
-    print(start_time)
-    print(end_time)
+    logger.info(start_time)
+    logger.info(end_time)
 
     try :
         logs = fetch_logs(now=now, start_time=start_time, end_time=end_time)
@@ -81,14 +84,14 @@ async def run_interval_report() -> dict[str, Any]:
         "end": end_time.strftime("%H:%M:%S"),
     }
     save_path = save_interval_report(result, start_time, end_time)
-    print(f"[SAVED] {save_path}")
+    logger.info(f"[SAVED] {save_path}")
 
     return result
 
 
 def main() -> None:
     result = asyncio.run(run_interval_report())
-    print(result)
+    logger.info(result)
 
 
 if __name__ == "__main__":

@@ -24,6 +24,9 @@ conda-meta/
 logs/
 *.log
 
+# Data
+data/
+
 # OS
 .DS_Store
 Thumbs.db

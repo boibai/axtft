@@ -42,14 +42,22 @@ OUTPUT RULES
 - Output ONLY a single valid JSON object
 - No markdown or explanation
 - All descriptions in Korean
-- Keep output concise (1~2 sentences per field)
+- Keep output concise but informative
+- "summary" must be 2~4 sentences describing:
+  - overall service condition
+  - performance pattern
+  - presence of incidents
+  - overall risk level
+- Each "action" must include both:
+  - what to do
+  - why it matters (in one sentence)
 - Avoid repetition
 
 ========================
 ANALYSIS RULES
 ========================
 
-- Summarize overall daily condition
+- Summarize overall daily condition with slightly more detail
 - Detect recurring latency issues
 - Detect service down events
 - Identify top incident (highest severity)
@@ -60,6 +68,7 @@ Interpretation:
 - Repeated latency → one pattern
 - Service down → top incident
 - Do NOT assume root cause
+- Actions should be practical and include reasoning
 
 ========================
 OUTPUT SCHEMA

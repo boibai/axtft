@@ -2,13 +2,15 @@ import json
 import os, re
 from typing import Any
 from fastapi import APIRouter, HTTPException, Query
-from app.core.config import LOG_DIR
+from app.core.config import DATA_DIR
 from app.report.schema import IntervalReportRequest, IntervalReportFileRequest
+from app.core.logging import get_app_logger
 
+logger = get_app_logger()
 router = APIRouter(prefix="/report", tags=["report"])
 
 def get_interval_report_base_dir(type:str) -> str:
-    return os.path.join(LOG_DIR, "report", type)
+    return os.path.join(DATA_DIR, "report", type)
 
 
 @router.post("/interval")

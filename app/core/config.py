@@ -5,10 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # 로그 파일을 저장할 디렉토리 경로
-LOG_DIR = os.getenv("LOG_DIR", "/data/logs")
+DATA_DIR = os.getenv("DATA_DIR", "./data")
+LOG_DIR = os.getenv("LOG_DIR", "./logs")
 
 # # 로그 디렉토리가 존재하지 않으면 자동 생성
-# os.makedirs(LOG_DIR, exist_ok=True)
+#os.makedirs(DATA_DIR, exist_ok=True)
 
 # 로컬 실행 시 기본 주소
 # Docker 환경에서는 "http://host.docker.internal:8000/v1/chat/completions"

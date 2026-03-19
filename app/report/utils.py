@@ -15,7 +15,7 @@ kst = timezone(timedelta(hours=9))
 def save_interval_report(result: dict, start_time: datetime, end_time: datetime):
     
     date_str = start_time.strftime("%Y-%m-%d")
-    base_dir = f"./logs/report/interval/{date_str.split("-")[0]}/{date_str.split("-")[1]}/{date_str.split("-")[2]}"
+    base_dir = f"./data/report/interval/{date_str.split("-")[0]}/{date_str.split("-")[1]}/{date_str.split("-")[2]}"
 
     os.makedirs(base_dir, exist_ok=True)
 
@@ -28,7 +28,7 @@ def save_interval_report(result: dict, start_time: datetime, end_time: datetime)
     return file_path
 
 def save_daily_report(result: dict, date: str):
-    base_dir = f"./logs/report/daily/{date.split("-")[0]}/{date.split("-")[1]}"
+    base_dir = f"./data/report/daily/{date.split("-")[0]}/{date.split("-")[1]}"
     os.makedirs(base_dir, exist_ok=True)
     filename = f"{date.split("-")[2]}.json"
     file_path = os.path.join(base_dir, filename)
@@ -514,7 +514,7 @@ def parse_time(t: str) -> datetime:
 
 def load_and_filter_reports(
     date_str: str,
-    root_path: str = "./logs/report/interval",
+    root_path: str = "./data/report/interval",
     exclude_low: bool = True,
 ) -> List[Dict[str, Any]]:
     base_path = f"{root_path}/{date_str.split("-")[0]}/{date_str.split("-")[1]}/{date_str.split("-")[2]}"

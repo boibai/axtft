@@ -11,11 +11,17 @@ from app.report.utils import (
     load_system_prompt,
     build_user_prompt_daily,
     build_chat_messages,
-    save_daily_report
+    save_daily_report,
+    get_last_15min_window
 )
 from app.langgraph.common.llm import call_report_llm
+from app.core.logging import get_interval_logger
 
 kst = timezone(timedelta(hours=9))
+now = datetime.now(kst)
+start_time, end_time = get_last_15min_window(now)
+
+logger = get_interval_logger(start_time, end_time, log_type="daily")
 
 async def run_daily_report() -> dict[str, Any]:
     
@@ -38,14 +44,14 @@ async def run_daily_report() -> dict[str, Any]:
     result["report_date"] = date_str
     
     save_path = save_daily_report(result, date_str)
-    print(f"[SAVED] {save_path}")
+    logger.info(f"[SAVED] {save_path}")
 
     return result
     
     
 def main() -> None:
     result = asyncio.run(run_daily_report())
-    print(result)
+    logger.info(result)
 
 
 if __name__ == "__main__":
