@@ -44,8 +44,11 @@ async def run_daily_report() -> dict[str, Any]:
     
     messages = build_chat_messages(system_prompt, user_prompt)
     
-    result = await call_report_llm(messages, type="daily")
+    result, token_info = await call_report_llm(messages, type="daily")
     result["report_date"] = date_str
+    
+    logger.info("%s TOKEN USAGE","=" * 20 )
+    logger.info(json.dumps(token_info, ensure_ascii=False, indent=2))
 
     logger.info("%s LLM RESULT","=" * 20 )
     logger.info(json.dumps(result, ensure_ascii=False, indent=2))
@@ -57,7 +60,10 @@ async def run_daily_report() -> dict[str, Any]:
     
     
 def main() -> None:
-    result = asyncio.run(run_daily_report())
+    try :
+        result = asyncio.run(run_daily_report())
+    except Exception as e :
+        logger.error(e)
     print(result)
     
 if __name__ == "__main__":
