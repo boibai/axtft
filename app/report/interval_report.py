@@ -29,6 +29,23 @@ start_time, end_time = get_last_15min_window(now)
 
 logger = get_interval_logger(start_time, end_time, log_type="interval")
 
+async def run_with_retry(max_retries: int = 3, delay_sec: int = 5):
+    for attempt in range(1, max_retries + 1):
+        try:
+            logger.info("RUN ATTEMPT %d/%d", attempt, max_retries)
+            result = await run_interval_report()
+            return result
+
+        except Exception as e:
+            logger.exception("RUN FAILED (attempt %d/%d)", attempt, max_retries)
+
+            if attempt == max_retries:
+                logger.error("ALL RETRIES FAILED")
+                raise
+
+            logger.info("RETRY AFTER %s sec...", delay_sec)
+            await asyncio.sleep(delay_sec)
+            
 async def run_interval_report() -> dict[str, Any]:
 
     logger.info("%s RUN INTERVAL REPORT","=" * 20 )
@@ -104,11 +121,11 @@ async def run_interval_report() -> dict[str, Any]:
 
 
 def main() -> None:
-    try :
-        result = asyncio.run(run_interval_report())
-    except Exception as e :
-        logger.error(e)
-    print(result)
+    try:
+        result = asyncio.run(run_with_retry())
+        print(result)
+    except Exception as e:
+        logger.error("FINAL FAILURE: %s", str(e))
 
 
 if __name__ == "__main__":
