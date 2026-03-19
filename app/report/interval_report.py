@@ -1,13 +1,9 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 from typing import Any
-from dateutil.parser import parse
-
 from app.langgraph.common.llm import call_report_llm
 from app.report.utils import (
-    format_logs_for_llm,
     get_last_15min_window,
-    parse_log_message,
     fetch_logs,
     build_log_llm_input,
     build_metric_queries,
@@ -16,7 +12,7 @@ from app.report.utils import (
     get_valid_metric_names,
     build_metric_llm_input,
     load_system_prompt,
-    build_user_prompt,
+    build_user_prompt_interval,
     build_chat_messages,
     save_interval_report
 )
@@ -35,7 +31,12 @@ async def run_interval_report() -> dict[str, Any]:
     print(start_time)
     print(end_time)
 
-    logs = fetch_logs(now=now, start_time=start_time, end_time=end_time)
+    try :
+        logs = fetch_logs(now=now, start_time=start_time, end_time=end_time)
+    except Exception as e :
+        print(e)
+        logs = ""
+        
     log_llm_input = build_log_llm_input(logs)
     
     queries = build_metric_queries()
@@ -67,14 +68,14 @@ async def run_interval_report() -> dict[str, Any]:
     )
 
     system_prompt = load_system_prompt(INTERVAL_REPORT_SYSTEM_PROMPT_PATH)
-    user_prompt = build_user_prompt(
+    user_prompt = build_user_prompt_interval(
         metric_llm_input=metric_llm_input,
         log_llm_input=truncate_by_tokens(log_llm_input, max_tokens=4096),
     )
     
     messages = build_chat_messages(system_prompt, user_prompt)
 
-    result = await call_report_llm(messages)
+    result = await call_report_llm(messages, type="interval")
     result["timeWindow"] = {
         "start": start_time.strftime("%H:%M:%S"),
         "end": end_time.strftime("%H:%M:%S"),

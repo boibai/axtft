@@ -1,7 +1,7 @@
-import re, requests, math, os, json
+import re, requests, math, os, json, glob
 from requests.auth import HTTPBasicAuth
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, Dict, List
 from collections import defaultdict
 from app.core.config import (
     LOG_SERVER,
@@ -13,15 +13,26 @@ from app.core.config import (
 kst = timezone(timedelta(hours=9))
 
 def save_interval_report(result: dict, start_time: datetime, end_time: datetime):
-    base_dir = "./logs/report/interval"
-
+    
     date_str = start_time.strftime("%Y-%m-%d")
+    base_dir = f"./logs/report/interval/{date_str.split("-")[0]}/{date_str.split("-")[1]}/{date_str.split("-")[2]}"
     dir_path = os.path.join(base_dir, date_str)
 
     os.makedirs(dir_path, exist_ok=True)
 
     filename = f"{start_time.strftime('%H%M')}_{end_time.strftime('%H%M')}.json"
     file_path = os.path.join(dir_path, filename)
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(result, f, ensure_ascii=False, indent=2)
+
+    return file_path
+
+def save_daily_report(result: dict, date: str):
+    base_dir = f"./logs/report/daily/{date.split("-")[0]}/{date.split("-")[1]}"
+    os.makedirs(base_dir, exist_ok=True)
+    filename = f"{date.split("-")[2]}.json"
+    file_path = os.path.join(base_dir, filename)
 
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
@@ -472,7 +483,7 @@ def load_system_prompt(path: str) -> str:
         return f.read()
 
 
-def build_user_prompt(metric_llm_input: str, log_llm_input: str) -> str:
+def build_user_prompt_interval(metric_llm_input: str, log_llm_input: str) -> str:
     return f"""Analyze the following information.
 
 METRIC_INPUT_START
@@ -484,9 +495,89 @@ LOG_INPUT_START
 LOG_INPUT_END
 """
 
+def build_user_prompt_daily(llm_input: str) -> str:
+    return f"""
+Analyze the following daily events and generate a report.
+
+{llm_input}
+"""
 
 def build_chat_messages(system_prompt: str, user_prompt: str) -> list[dict[str, str]]:
     return [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
+
+
+def parse_time(t: str) -> datetime:
+    return datetime.strptime(t, "%H:%M:%S")
+
+
+def load_and_filter_reports(
+    date_str: str,
+    root_path: str = "./logs/report/interval",
+    exclude_low: bool = True,
+) -> List[Dict[str, Any]]:
+    base_path = f"{root_path}/{date_str}"
+    json_files = glob.glob(f"{base_path}/*.json")
+
+    data_list: List[Dict[str, Any]] = []
+
+    for file_path in json_files:
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                data_list.append(data)
+        except Exception as e:
+            print(f"읽기 실패: {file_path} → {e}")
+
+    filtered: List[Dict[str, Any]] = []
+
+    for item in data_list:
+        try:
+            level = item.get("level")
+            time_window = item.get("timeWindow", {})
+            start_time = time_window.get("start")
+
+            if not start_time:
+                continue
+
+            if exclude_low and level == "low":
+                continue
+
+            filtered.append(
+                {
+                    "level": level,
+                    "summary": item.get("summary"),
+                    "start": start_time,
+                    "end": time_window.get("end"),
+                    "events": item.get("events", []),
+                }
+            )
+        except Exception as e:
+            print(f"파싱 실패: {e}")
+
+    filtered_sorted = sorted(filtered, key=lambda x: parse_time(x["start"]))
+    return filtered_sorted
+
+
+def build_llm_input(data):
+    lines = []
+
+    for item in data:
+        line = (
+            f"[{item['start']} ~ {item['end']}] "
+            f"level={item['level']} | "
+            f"{item['summary']}"
+        )
+        lines.append(line)
+
+        # 이벤트도 포함 (있으면)
+        for ev in item.get("events", []):
+            ev_line = (
+                f"  - ({ev.get('start_time')} ~ {ev.get('end_time')}) "
+                f"{ev.get('summary')}"
+            )
+            lines.append(ev_line)
+
+    return "\n".join(lines)

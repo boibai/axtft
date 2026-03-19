@@ -4,7 +4,7 @@ from app.langgraph.common.schema import ErrorCauseList, AnomalyCauseList
 from app.core.config import VLLM_BASE_URL, MODEL_NAME, VLLM_BASE_URL2
 from app.langgraph.common.chat_memory import ChatMemory
 from app.core.redis import get_redis_client
-from app.report.schema import TenMinuteSummaryReport
+from app.report.schema import TenMinuteSummaryReport, DailyReport
 
 redis_client = get_redis_client()
 chat_memory = ChatMemory(redis_client)
@@ -98,10 +98,16 @@ async def call_analyze_anomaly_llm(state: AnalyzeState) -> AnalyzeState:
     return state
 
 
-async def call_report_llm(prompt: list) :
+async def call_report_llm(prompt: list, type: str) :
 
     start = time.perf_counter()
 
+    if type == "interval" :
+        json_schema = TenMinuteSummaryReport.model_json_schema()
+    
+    elif type == "daily" :
+        json_schema = DailyReport.model_json_schema()
+    
     payload = {
         "model": MODEL_NAME,
         "messages": prompt,
@@ -112,7 +118,7 @@ async def call_report_llm(prompt: list) :
             "type": "json_schema",
             "json_schema": {
                 "name": "cause-list",
-                "schema": TenMinuteSummaryReport.model_json_schema(),
+                "schema": json_schema,
             },
         },
     }
