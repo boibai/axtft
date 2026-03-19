@@ -16,12 +16,11 @@ def save_interval_report(result: dict, start_time: datetime, end_time: datetime)
     
     date_str = start_time.strftime("%Y-%m-%d")
     base_dir = f"./logs/report/interval/{date_str.split("-")[0]}/{date_str.split("-")[1]}/{date_str.split("-")[2]}"
-    dir_path = os.path.join(base_dir, date_str)
 
-    os.makedirs(dir_path, exist_ok=True)
+    os.makedirs(base_dir, exist_ok=True)
 
     filename = f"{start_time.strftime('%H%M')}_{end_time.strftime('%H%M')}.json"
-    file_path = os.path.join(dir_path, filename)
+    file_path = os.path.join(base_dir, filename)
 
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
@@ -518,7 +517,7 @@ def load_and_filter_reports(
     root_path: str = "./logs/report/interval",
     exclude_low: bool = True,
 ) -> List[Dict[str, Any]]:
-    base_path = f"{root_path}/{date_str}"
+    base_path = f"{root_path}/{date_str.split("-")[0]}/{date_str.split("-")[1]}/{date_str.split("-")[2]}"
     json_files = glob.glob(f"{base_path}/*.json")
 
     data_list: List[Dict[str, Any]] = []
