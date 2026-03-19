@@ -61,11 +61,11 @@ async def run_daily_report() -> dict[str, Any]:
     
     messages = build_chat_messages(system_prompt, user_prompt)
     
-    result, token_info = await call_report_llm(messages, type="daily")
+    result, metadata = await call_report_llm(messages, type="daily")
     result["report_date"] = date_str
     
-    logger.info("%s TOKEN USAGE","=" * 20 )
-    logger.info(json.dumps(token_info, ensure_ascii=False, indent=2))
+    logger.info("%s META DATA","=" * 20 )
+    logger.info(json.dumps(metadata, ensure_ascii=False, indent=2))
 
     logger.info("%s LLM RESULT","=" * 20 )
     logger.info(json.dumps(result, ensure_ascii=False, indent=2))

@@ -128,13 +128,14 @@ async def call_report_llm(prompt: list, type: str) :
 
     data = resp.json()
     usage = data.get("usage", {})
-
-    token_info = {
+    
+    metadata = {
         "prompt_tokens" : usage.get("prompt_tokens"),
         "completion_tokens" : usage.get("completion_tokens"),
-        "total_tokens" : usage.get("total_tokens")
+        "total_tokens" : usage.get("total_tokens"),
+        "elapsed_sec" : round(time.perf_counter() - start, 3)
     }
 
     result = json.loads(data["choices"][0]["message"]["content"])
 
-    return result, token_info
+    return result, metadata
