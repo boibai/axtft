@@ -1,4 +1,4 @@
-import asyncio
+import asyncio, json
 from datetime import datetime, timedelta, timezone
 from typing import Any
 from app.langgraph.common.llm import call_report_llm
@@ -31,16 +31,17 @@ logger = get_interval_logger(start_time, end_time, log_type="interval")
 
 async def run_interval_report() -> dict[str, Any]:
 
-    logger.info(start_time)
-    logger.info(end_time)
+    logger.info("%s RUN INTERVAL REPORT","=" * 20 )
+    logger.info("- START TIME : %s", start_time)
+    logger.info("- END TIME : %s", end_time)
 
     try :
         logs = fetch_logs(now=now, start_time=start_time, end_time=end_time)
     except Exception as e :
-        print(e)
+        logger.error(e)
         logs = ""
-        
-    log_llm_input = build_log_llm_input(logs)
+    
+    log_llm_input = truncate_by_tokens(build_log_llm_input(logs), max_tokens=4096)
     
     queries = build_metric_queries()
     metric_names = list(queries.keys())
@@ -71,9 +72,15 @@ async def run_interval_report() -> dict[str, Any]:
     )
 
     system_prompt = load_system_prompt(INTERVAL_REPORT_SYSTEM_PROMPT_PATH)
+    
+    logger.info("%s LOG INPUT","=" * 20 )
+    logger.info(log_llm_input)
+    
+    logger.info("%s METRIC INPUT","=" * 20 )
+    logger.info(metric_llm_input) 
     user_prompt = build_user_prompt_interval(
         metric_llm_input=metric_llm_input,
-        log_llm_input=truncate_by_tokens(log_llm_input, max_tokens=4096),
+        log_llm_input=log_llm_input
     )
     
     messages = build_chat_messages(system_prompt, user_prompt)
@@ -83,6 +90,10 @@ async def run_interval_report() -> dict[str, Any]:
         "start": start_time.strftime("%H:%M:%S"),
         "end": end_time.strftime("%H:%M:%S"),
     }
+    
+    logger.info("%s LLM RESULT","=" * 20 )
+    logger.info(json.dumps(result, ensure_ascii=False, indent=2))
+    
     save_path = save_interval_report(result, start_time, end_time)
     logger.info(f"[SAVED] {save_path}")
 
@@ -91,7 +102,7 @@ async def run_interval_report() -> dict[str, Any]:
 
 def main() -> None:
     result = asyncio.run(run_interval_report())
-    logger.info(result)
+    print(result)
 
 
 if __name__ == "__main__":

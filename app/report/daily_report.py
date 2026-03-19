@@ -1,4 +1,4 @@
-import asyncio
+import asyncio, json
 from datetime import datetime, timedelta, timezone
 from typing import Any
 from app.core.config import (
@@ -25,14 +25,18 @@ logger = get_interval_logger(start_time, end_time, log_type="daily")
 
 async def run_daily_report() -> dict[str, Any]:
     
+    logger.info("%s RUN DAILY REPORT","=" * 20 )
     yesterday = datetime.now() - timedelta(days=1)
     date_str = yesterday.strftime("%Y-%m-%d")  # 예: 2026-03-18
     
+    logger.info("- TARGET DATE : %s", date_str)
     reports = load_and_filter_reports(date_str)
 
     llm_input_text_raw = build_llm_input(reports)
     llm_input_text = truncate_by_tokens(llm_input_text_raw, max_tokens=4096),
     
+    logger.info("%s INPUT INTERVAL REPORTS","=" * 20 )
+    logger.info("\n%s",llm_input_text[0])
     system_prompt = load_system_prompt(DAILY_REPORT_SYSTEM_PROMPT_PATH)
     user_prompt = build_user_prompt_daily(
         llm_input=llm_input_text
@@ -42,6 +46,9 @@ async def run_daily_report() -> dict[str, Any]:
     
     result = await call_report_llm(messages, type="daily")
     result["report_date"] = date_str
+
+    logger.info("%s LLM RESULT","=" * 20 )
+    logger.info(json.dumps(result, ensure_ascii=False, indent=2))
     
     save_path = save_daily_report(result, date_str)
     logger.info(f"[SAVED] {save_path}")
@@ -51,9 +58,8 @@ async def run_daily_report() -> dict[str, Any]:
     
 def main() -> None:
     result = asyncio.run(run_daily_report())
-    logger.info(result)
-
-
+    print(result)
+    
 if __name__ == "__main__":
     main()
     

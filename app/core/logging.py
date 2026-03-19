@@ -118,7 +118,7 @@ def get_interval_logger(start_time, end_time, log_type):
         filename = f"{start_time.strftime('%H%M')}_{end_time.strftime('%H%M')}.txt"
     else :
         base_dir = f"./logs/report/daily/{date_str.split("-")[0]}/{date_str.split("-")[1]}"
-        filename = f"{date_str}.txt"
+        filename = f"{date_str.split("-")[2]}.txt"
 
     os.makedirs(base_dir, exist_ok=True)
     file_path = os.path.join(base_dir, filename)

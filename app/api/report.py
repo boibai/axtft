@@ -1,6 +1,4 @@
-import json
-import os, re
-from typing import Any
+import json, os, re
 from fastapi import APIRouter, HTTPException
 from app.core.config import DATA_DIR
 from app.report.schema import IntervalReportRequest, IntervalReportFileRequest
