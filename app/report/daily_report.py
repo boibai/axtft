@@ -71,7 +71,7 @@ async def run_daily_report() -> dict[str, Any]:
     logger.info(json.dumps(result, ensure_ascii=False, indent=2))
     
     save_path = save_daily_report(result, date_str)
-    logger.info(f"[SAVED] {save_path}")
+    logger.info(f"{"=" * 20 } SAVED DATA : {save_path}")
 
     return result
     

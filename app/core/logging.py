@@ -3,7 +3,7 @@ import os
 import logging
 from typing import Dict, Optional
 from contextvars import ContextVar
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.core.config import DATA_DIR, LOG_DIR
 
@@ -112,13 +112,15 @@ def get_interval_logger(start_time, end_time, log_type):
     logger.setLevel(logging.INFO)
     
     date_str = start_time.strftime("%Y-%m-%d")
+    yesterday = start_time - timedelta(days=1)
+    yesterday_str = yesterday.strftime("%Y-%m-%d")
     
     if log_type == "interval" :
         base_dir = f"./logs/report/interval/{date_str.split("-")[0]}/{date_str.split("-")[1]}/{date_str.split("-")[2]}"
         filename = f"{start_time.strftime('%H%M')}_{end_time.strftime('%H%M')}.txt"
     else :
-        base_dir = f"./logs/report/daily/{date_str.split("-")[0]}/{date_str.split("-")[1]}"
-        filename = f"{date_str.split("-")[2]}.txt"
+        base_dir = f"./logs/report/daily/{yesterday_str.split("-")[0]}/{yesterday_str.split("-")[1]}"
+        filename = f"{yesterday_str.split("-")[2]}.txt"
 
     os.makedirs(base_dir, exist_ok=True)
     file_path = os.path.join(base_dir, filename)

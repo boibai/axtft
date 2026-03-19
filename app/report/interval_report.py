@@ -115,7 +115,7 @@ async def run_interval_report() -> dict[str, Any]:
     logger.info(json.dumps(result, ensure_ascii=False, indent=2))
     
     save_path = save_interval_report(result, start_time, end_time)
-    logger.info(f"[SAVED] {save_path}")
+    logger.info(f"{"=" * 20 } SAVED DATA : {save_path}")
 
     return result
 
