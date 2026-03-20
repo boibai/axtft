@@ -96,23 +96,47 @@ LANGUAGE RULES
 SEVERITY RULES
 ========================
 
-Use severity conservatively.
+Severity MUST be determined using an implicit severity score (0~100).
 
 - "high":
-  Use only for clear service outage or severe system breakdown.
-  Example: service_status = 0 or clear service unavailability.
+  Score 85~100
+  Use for:
+  - clear service outage
+  - near-outage conditions
+  - severe instability likely to cause immediate service impact
+  - "high" includes both actual outage and pre-outage conditions with strong evidence of imminent service failure.
+  
+  Examples:
+  - service_status = 0
+  - throughput near zero
+  - sustained very high error rate
+  - sustained extreme latency with clear user impact
+  - multiple strong failure signals occurring together
+  - system behavior indicating imminent breakdown even if full outage has not yet occurred
 
 - "medium":
-  Use only when the abnormality is clearly outside normal range,
-  sustained for a meaningful part of the window,
-  and likely to have noticeable operational impact.
+  Score 65~84
+  Use only when:
+  - abnormality is clearly outside normal range
+  - sustained over time
+  - operational impact is noticeable
+  - but the system is still functioning without near-outage signs
 
 - "low":
-  Default level.
-  Use for normal conditions, minor deviations, short spikes,
-  ambiguous signals, or anomalies that remain within normal range.
+  Score 0~64 (DEFAULT)
+  Includes:
+  - short spikes
+  - minor deviations
+  - ambiguous signals
+  - isolated anomalies
+  - values still within acceptable range
 
-If unsure, choose "low".
+IMPORTANT:
+- Most cases MUST be classified as "low"
+- The presence of anomalies does NOT imply "medium"
+- "medium" should be used for clear but non-critical degradation
+- "high" should be used for outage or near-outage conditions only
+- If unsure between levels, choose the lower one
 
 ========================
 OUTPUT RULES

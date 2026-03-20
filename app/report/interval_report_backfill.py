@@ -1,6 +1,7 @@
 import os
 import subprocess
 import argparse
+import time
 from datetime import datetime, timedelta, timezone
 from app.core.logging import get_interval_backfill_logger
 
@@ -18,7 +19,18 @@ def iter_windows(start, end, step=10):
         nxt = cur + timedelta(minutes=step)
         yield cur, nxt
         cur = nxt
+        
+def count_json_files(start_dt):
+    base_dir = (
+        f"./data/report/interval/"
+        f"{start_dt.strftime('%Y')}/"
+        f"{start_dt.strftime('%m')}/"
+        f"{start_dt.strftime('%d')}"
+    )
+    if not os.path.exists(base_dir):
+        return 0
 
+    return len([f for f in os.listdir(base_dir) if f.endswith(".json")])
 
 def get_file_path(start_time, end_time):
     base_dir = (
@@ -48,12 +60,14 @@ def backfill(start_dt, end_dt ,logger):
             "--start", s.strftime("%Y-%m-%d %H:%M:%S"),
             "--end", e.strftime("%Y-%m-%d %H:%M:%S"),
         ], check=True)
+        
+        time.sleep(300)
 
 
 def get_yesterday_range(now=None):
     if now is None:
         now = datetime.now(kst)
-
+        
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     yesterday_start = today_start - timedelta(days=1)
     return yesterday_start, today_start
@@ -77,3 +91,5 @@ if __name__ == "__main__":
     logger = get_interval_backfill_logger(start)
     logger.info("BACKFILL RANGE: %s ~ %s", start, end)
     backfill(start, end, logger)
+    total_files = count_json_files(start)
+    logger.info("TOTAL JSON FILE COUNT: %s", total_files)
