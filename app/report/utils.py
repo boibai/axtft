@@ -111,6 +111,11 @@ def get_last_15min_window(now):
     start_time = end_time - timedelta(minutes=10)
     return start_time, end_time
 
+def get_yesterday(now):
+    yesterday = now - timedelta(days=1)
+    target_date = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    return target_date
 
 def safe_get(data: dict[str, Any], *keys: str, default: Any = None) -> Any:
     current = data

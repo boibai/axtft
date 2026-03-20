@@ -52,4 +52,3 @@ class DailyReport(BaseModel):
     patterns: List[PatternItem]
     timeline_compact: List[TimelineCompactItem]
     actions: List[ActionItem]
-    stats: Stats

@@ -1,5 +1,5 @@
-import asyncio, json
-from datetime import datetime, timedelta, timezone
+import asyncio, json, argparse
+from datetime import datetime, timezone, timedelta
 from typing import Any
 from app.langgraph.common.llm import call_report_llm
 from app.langgraph.common.utils import truncate_by_tokens
@@ -24,19 +24,21 @@ from app.core.config import (
 from app.core.logging import get_interval_logger
 
 kst = timezone(timedelta(hours=9))
-now = datetime.now(kst)
-start_time, end_time = get_last_15min_window(now)
 
-logger = get_interval_logger(start_time, end_time, log_type="interval")
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--start", type=str, required=False)
+    parser.add_argument("--end", type=str, required=False)
+    return parser.parse_args()
 
-async def run_with_retry(max_retries: int = 3, delay_sec: int = 5):
+async def run_with_retry(start_time, end_time, logger, max_retries: int = 3, delay_sec: int = 60):
     for attempt in range(1, max_retries + 1):
         try:
             logger.info("RUN ATTEMPT %d/%d", attempt, max_retries)
-            result = await run_interval_report()
+            result = await run_interval_report(start_time, end_time, logger)
             return result
 
-        except Exception as e:
+        except Exception:
             logger.exception("RUN FAILED (attempt %d/%d)", attempt, max_retries)
 
             if attempt == max_retries:
@@ -46,12 +48,14 @@ async def run_with_retry(max_retries: int = 3, delay_sec: int = 5):
             logger.info("RETRY AFTER %s sec...", delay_sec)
             await asyncio.sleep(delay_sec)
             
-async def run_interval_report() -> dict[str, Any]:
+async def run_interval_report(start_time, end_time, logger) -> dict[str, Any]:
 
+    now = end_time 
+    
     logger.info("%s RUN INTERVAL REPORT","=" * 20 )
     logger.info("- START TIME : %s", start_time)
     logger.info("- END TIME : %s", end_time)
-
+    
     try :
         logs = fetch_logs(now=now, start_time=start_time, end_time=end_time)
     except Exception as e :
@@ -121,8 +125,20 @@ async def run_interval_report() -> dict[str, Any]:
 
 
 def main() -> None:
+    args = parse_args()
+
+    if args.start and args.end:
+
+        start_time = datetime.strptime(args.start, "%Y-%m-%d %H:%M:%S").replace(tzinfo=kst)
+        end_time = datetime.strptime(args.end, "%Y-%m-%d %H:%M:%S").replace(tzinfo=kst)
+    else:
+        now = datetime.now(kst)
+        start_time, end_time = get_last_15min_window(now)
+
+    logger = get_interval_logger(start_time, end_time)
+
     try:
-        result = asyncio.run(run_with_retry())
+        result = asyncio.run(run_with_retry(start_time, end_time, logger))
         print(result)
     except Exception as e:
         logger.error("FINAL FAILURE: %s", str(e))

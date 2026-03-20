@@ -136,6 +136,7 @@ async def call_report_llm(prompt: list, type: str) :
         "elapsed_sec" : round(time.perf_counter() - start, 3)
     }
 
+    print(data["choices"][0]["message"]["content"])
     result = json.loads(data["choices"][0]["message"]["content"])
 
     return result, metadata
