@@ -83,10 +83,8 @@ def build_metrics_block_table(metrics: Iterable) -> str:
     # 시간 순 정렬
     metrics.sort(key=lambda m: m.timestamp)
 
-    # 출력 컬럼 (timestamp 포함)
     columns = ["timestamp"] + [f for f in METRIC_FIELDS if f != "timestamp"]
 
-    # 헤더 1줄
     header = " | ".join(columns)
 
     lines = [header]
@@ -101,7 +99,7 @@ def build_metrics_block_table(metrics: Iterable) -> str:
                 continue
 
             if field == "timestamp":
-                # MM-DDTHH:MM:SS 형태
+
                 value = value.strftime("%m-%dT%H:%M")
 
             row.append(str(value))

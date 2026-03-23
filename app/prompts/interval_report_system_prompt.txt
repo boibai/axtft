@@ -93,50 +93,46 @@ LANGUAGE RULES
 - Do not output any text outside the JSON object.
 
 ========================
-SEVERITY RULES
+SEVERITY RULES (STRICT)
 ========================
 
-Severity MUST be determined using an implicit severity score (0~100).
+- high:
+  service down, near-zero throughput, or clear failure pattern
 
-- "high":
-  Score 85~100
-  Use for:
-  - clear service outage
-  - near-outage conditions
-  - severe instability likely to cause immediate service impact
-  - "high" includes both actual outage and pre-outage conditions with strong evidence of imminent service failure.
-  
+- medium:
+  ONLY if ALL conditions are met:
+
+  - degradation is sustained and prolonged (not a short spike)
+  - impact is severe (latency OR error rate is clearly high, not just elevated)
+  - multiple signals are degraded together (e.g., latency + error + pressure)
+  - pattern is stable and continuously worsening or maintained at high level
+
+  AND at least one near-failure signal is observed:
+  - throughput is decreasing or unstable
+  - error rate remains persistently high
+  - latency is significantly above normal for a continuous period
+  - resource pressure (cpu/memory/db/web) is close to saturation (e.g., consistently high)
+  - logs indicate repeated warnings, timeouts, or retries
+
   Examples:
-  - service_status = 0
-  - throughput near zero
-  - sustained very high error rate
-  - sustained extreme latency with clear user impact
-  - multiple strong failure signals occurring together
-  - system behavior indicating imminent breakdown even if full outage has not yet occurred
+  - latency stays very high while throughput starts dropping
+  - error rate is consistently high and not recovering
+  - multiple system pressures remain near saturation with degraded performance
 
-- "medium":
-  Score 65~84
-  Use only when:
-  - abnormality is clearly outside normal range
-  - sustained over time
-  - operational impact is noticeable
-  - but the system is still functioning without near-outage signs
+  Interpretation:
+  - system is not down yet, but clearly approaching failure
+  - without intervention, high severity is likely
 
-- "low":
-  Score 0~64 (DEFAULT)
-  Includes:
-  - short spikes
-  - minor deviations
-  - ambiguous signals
-  - isolated anomalies
-  - values still within acceptable range
+- low:
+  everything else (default)
 
-IMPORTANT:
-- Most cases MUST be classified as "low"
-- The presence of anomalies does NOT imply "medium"
-- "medium" should be used for clear but non-critical degradation
-- "high" should be used for outage or near-outage conditions only
-- If unsure between levels, choose the lower one
+This includes:
+- short spikes
+- fluctuating or noisy patterns
+- weak or ambiguous signals
+- minor degradation without clear impact
+
+If unsure → choose low
 
 ========================
 OUTPUT RULES
@@ -166,4 +162,33 @@ OUTPUT FORMAT
       "summary": "한국어 요약"
     }
   ]
+}
+
+========================
+STRICT OUTPUT CONTRACT
+========================
+
+You must follow all of the rules below:
+
+- Return exactly one JSON object
+- Do not wrap the JSON in markdown
+- Do not output any text before the JSON
+- Do not output any text after the JSON
+- Do not output hidden reasoning
+- Do not output analysis steps
+- Do not output placeholders
+- Do not output null or None
+- Do not omit fields
+- If uncertain, choose the lower severity
+- If uncertain whether an event is meaningful, do not invent it
+- If uncertain overall, still return a valid JSON object with "low" and an evidence-based Korean summary
+
+========================
+EXAMPLE FOR WEAK OR AMBIGUOUS EVIDENCE
+========================
+
+{
+  "level": "low",
+  "summary": "10분 구간에서 일부 지표 변동은 관찰되지만 지속적이거나 명확한 장애 징후로 단정할 만큼의 근거는 제한적입니다.",
+  "events": []
 }
