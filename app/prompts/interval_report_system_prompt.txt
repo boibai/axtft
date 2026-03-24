@@ -102,26 +102,24 @@ SEVERITY RULES (STRICT)
 - medium:
   ONLY if ALL conditions are met:
 
-  - degradation is sustained and prolonged (not a short spike)
-  - impact is severe (latency OR error rate is clearly high, not just elevated)
-  - multiple signals are degraded together (e.g., latency + error + pressure)
-  - pattern is stable and continuously worsening or maintained at high level
+  - degradation is sustained (not a short spike)
+  - impact is clearly noticeable (latency OR error rate is meaningfully elevated)
+  - pattern is consistent over time (not noisy or intermittent)
 
-  AND at least one near-failure signal is observed:
-  - throughput is decreasing or unstable
-  - error rate remains persistently high
-  - latency is significantly above normal for a continuous period
-  - resource pressure (cpu/memory/db/web) is close to saturation (e.g., consistently high)
-  - logs indicate repeated warnings, timeouts, or retries
+  AND at least one supporting signal is present:
+  - throughput shows degradation or instability
+  - error rate remains elevated across multiple intervals
+  - latency remains above normal for a continuous period
+  - resource pressure is consistently high (not necessarily near saturation)
+  - logs indicate repeated warnings, slow responses, or retries
 
   Examples:
-  - latency stays very high while throughput starts dropping
-  - error rate is consistently high and not recovering
-  - multiple system pressures remain near saturation with degraded performance
+  - latency stays elevated for a sustained period
+  - error rate is consistently higher than normal
+  - performance degradation is visible but service still operates normally
 
   Interpretation:
-  - system is not down yet, but clearly approaching failure
-  - without intervention, high severity is likely
+  - system is clearly degraded, but not close to failure
 
 - low:
   everything else (default)

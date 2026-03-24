@@ -9,15 +9,21 @@ from app.core.config import DATA_DIR, LOG_DIR
 request_id_var: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
 log_path_var: ContextVar[Optional[str]] = ContextVar("log_path", default=None)
 
-
 def write_json_data(filename: str, data: Dict, data_type: str):
-    dir_path = os.path.join(DATA_DIR, data_type)
+
+    date_str = filename.split("_")[0] 
+
+    year = date_str[:4]
+    month = date_str[4:6]
+    day = date_str[6:8]
+
+    dir_path = os.path.join(DATA_DIR, data_type, year, month, day)
     os.makedirs(dir_path, exist_ok=True)
     path = os.path.join(dir_path, filename)
 
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
-
+        
 
 class RequestContextFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
@@ -55,11 +61,19 @@ def get_app_logger() -> logging.Logger:
     logger.addFilter(RequestContextFilter())
     return logger
 
-
 def start_request_file_logging(request_id: str, log_dir: str) -> str:
-    #os.makedirs(log_dir, exist_ok=True)
+
     filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{request_id}.txt"
-    path = os.path.join(log_dir, filename)
+
+    date_str = filename.split("_")[0]
+    year = date_str[:4]
+    month = date_str[4:6]
+    day = date_str[6:8]
+
+    dir_path = os.path.join(log_dir, year, month, day)
+    os.makedirs(dir_path, exist_ok=True)
+
+    path = os.path.join(dir_path, filename)
 
     request_id_var.set(request_id)
     log_path_var.set(path)
@@ -75,12 +89,11 @@ def start_request_file_logging(request_id: str, log_dir: str) -> str:
     )
     fh.addFilter(RequestFileFilter(request_id))
 
-    fh._axtft_request_id = request_id  # type: ignore[attr-defined]
+    fh._axtft_request_id = request_id
     logger.addHandler(fh)
 
     logger.info("request logging started: %s", path)
     return path
-
 
 def stop_request_file_logging(request_id: str) -> None:
     logger = get_app_logger()
