@@ -1,8 +1,7 @@
-from pydantic import BaseModel, BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 from typing import List, Optional, Literal, Dict, Any
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
 class LogInfo(BaseModel):
     level: str
     logger: str
@@ -29,7 +28,7 @@ class ErrorInfo(BaseModel):
     stack_trace: str
 
 class MetricPoint(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="allow")
 
     timestamp: datetime = Field(alias='@timestamp')
     http_error_rate: float
@@ -42,18 +41,18 @@ class MetricPoint(BaseModel):
     db_connection_pool: int
     disk_usage: float
 
-class LogEntry(BaseModel):
-    timestamp: str = Field(alias='@timestamp')
-    log: LogInfo
-    process: ProcessInfo
-    service: ServiceInfo
-    labels: LabelsInfo
-    message: str
-    event: EventInfo
+# class LogEntry(BaseModel):
+#     timestamp: str = Field(alias='@timestamp')
+#     log: LogInfo
+#     process: ProcessInfo
+#     service: ServiceInfo
+#     labels: LabelsInfo
+#     message: str
+#     event: EventInfo
 
 class AnalyzeErrorRequest(BaseModel):
 
-    model_config = ConfigDict(extra="forbid")  # allow, ignore
+    model_config = ConfigDict(extra="allow")
 
     timestamp: str = Field(alias='@timestamp')
 
@@ -76,15 +75,66 @@ class AnalyzeErrorRequest(BaseModel):
 
     error: ErrorInfo
 
-## 임시
 class AnalyzeErrorMessageRequest(BaseModel):
 
-    model_config = ConfigDict(extra="forbid")  # allow, ignore
+    model_config = ConfigDict(extra="allow") 
     message: str
+
+
+
+class Thread(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    name: Optional[str] = None
+
+
+class Process(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    pid: Optional[int] = None
+    thread: Optional[Thread] = None
+
+
+class Log(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    timestamp: Optional[str] = Field(default=None, alias='@timestamp')
+    message: Optional[str] = None
+    level: Optional[str] = None
+    logger: Optional[str] = None
+
+
+class Service(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    name: Optional[str] = None
+
+
+class Labels(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    log_type: Optional[str] = None
+
+
+class Event(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    dataset: Optional[str] = None
+
+
+class LogEntry(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    log: Optional[Log] = None
+    process: Optional[Process] = None
+    service: Optional[Service] = None
+    labels: Optional[Labels] = None
+    event: Optional[Event] = None
+    
 
 class AnalyzeAnomalyRequest(BaseModel):
 
-    model_config = ConfigDict(extra="forbid")  # allow, ignore
+    model_config = ConfigDict(extra="allow")
     metrics: List[MetricPoint] = Field(default_factory=list)
     logs: List[LogEntry] = Field(default_factory=list)
     
@@ -109,3 +159,8 @@ class AnomalyCauseItem(BaseModel):
 class AnomalyCauseList(BaseModel):
     riskLevel: Literal["LOW", "MEDIUM", "HIGH"]
     causeList: List[AnomalyCauseItem]
+    
+    
+    
+
+

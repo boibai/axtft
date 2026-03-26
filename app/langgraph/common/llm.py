@@ -135,7 +135,8 @@ async def call_report_llm(prompt: list, type: str) :
         "total_tokens" : usage.get("total_tokens"),
         "elapsed_sec" : round(time.perf_counter() - start, 3)
     }
-
+    
+    print(json.dumps(data, indent=2, ensure_ascii=False))
     print(data["choices"][0]["message"]["content"])
     result = json.loads(data["choices"][0]["message"]["content"])
 

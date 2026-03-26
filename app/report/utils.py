@@ -143,9 +143,12 @@ def build_log_query() -> dict[str, Any]:
 def build_metric_queries() -> dict[str, str]:
     return {
         "http_error_rate": """
-            sum(rate(http_server_requests_seconds_count{status=~"5.."}[1m]))
+            (
+            sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m]))
+            or vector(0)
+            )
             /
-            clamp_min(sum(rate(http_server_requests_seconds_count[1m])), 1e-9)
+            clamp_min(sum(rate(http_server_requests_seconds_count[5m])), 1e-9)
         """,
         "latency_p95": """
             histogram_quantile(

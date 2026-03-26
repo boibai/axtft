@@ -97,29 +97,20 @@ SEVERITY RULES (STRICT)
 ========================
 
 - high:
-  service down, near-zero throughput, or clear failure pattern
+  service down (service_status = 0)
+  OR throughput near zero
+  OR error rate extremely high and sustained (e.g. > 70~80%)
 
 - medium:
-  ONLY if ALL conditions are met:
+  sustained degradation (3+ intervals)
 
-  - degradation is sustained (not a short spike)
-  - impact is clearly noticeable (latency OR error rate is meaningfully elevated)
-  - pattern is consistent over time (not noisy or intermittent)
+  AND clear user impact
+    (latency OR error rate significantly high)
 
-  AND at least one supporting signal is present:
-  - throughput shows degradation or instability
-  - error rate remains elevated across multiple intervals
-  - latency remains above normal for a continuous period
-  - resource pressure is consistently high (not necessarily near saturation)
-  - logs indicate repeated warnings, slow responses, or retries
-
-  Examples:
-  - latency stays elevated for a sustained period
-  - error rate is consistently higher than normal
-  - performance degradation is visible but service still operates normally
-
-  Interpretation:
-  - system is clearly degraded, but not close to failure
+  AND at least ONE supporting signal:
+    - throughput instability
+    - resource pressure high
+    - repeated failures in logs
 
 - low:
   everything else (default)

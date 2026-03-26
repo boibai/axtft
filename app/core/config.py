@@ -63,13 +63,15 @@ METRIC_FIELDS = [
 
 # Log Fields
 LOG_FIELDS = [
-    "timestamp",
-    #"service",
-    #"pid",
-    #"thread",
-    "level",
-    "logger",
-    "message",
+    ("timestamp", "log.@timestamp"),
+    ("service_name", "service.name"),
+    ("pid", "process.pid"),
+    ("thread", "process.thread.name"),
+    ("log_type", "labels.log_type"),
+    # ("dataset", "event.dataset"),
+    ("logger", "log.logger"),
+    ("log_level", "log.level"),
+    ("message", "log.message"),
 ]
 
 # Log Server

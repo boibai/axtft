@@ -128,6 +128,8 @@ async def handle_anomaly(
 ):
     request_id = get_current_request_id()
     
+    logger.info("- INPUT:\n%s",json.dumps(message.model_dump(), indent=2, ensure_ascii=False, default=str))
+    
     if not request_id:
 
         request_id = str(uuid.uuid4())[:8]

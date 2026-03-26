@@ -23,58 +23,6 @@ def count_tokens(text: str, model: str = "gpt-oss-20b") -> int:
     
     return len(tokens)
 
-
-def _as_dict(obj: Any) -> dict:
-    # Pydantic v2
-    if hasattr(obj, "model_dump"):
-        return obj.model_dump(by_alias=True)
-    # Pydantic v1
-    if hasattr(obj, "dict"):
-        return obj.dict(by_alias=True)
-    # 이미 dict/Mapping이면
-    if isinstance(obj, Mapping):
-        return dict(obj)
-    # 마지막 fallback
-    return {}
-
-def format_logs_as_table(logs: list[Any]) -> str:
-    lines = []
-
-    header = " | ".join(LOG_FIELDS)
-    lines.append(header)
-
-    for item in logs:
-        log = _as_dict(item)
-
-        ts = log.get("@timestamp", "")
-        level = (log.get("log") or {}).get("level", "")
-        logger = (log.get("log") or {}).get("logger", "")
-        #pid = (log.get("process") or {}).get("pid", "")
-        #thread = ((log.get("process") or {}).get("thread") or {}).get("name", "")
-        #service = (log.get("service") or {}).get("name", "")
-        message = log.get("message", "")
-
-        if ts:
-            try:
-                dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
-                ts = dt.strftime("%m-%dT%H:%M:%S")
-            except Exception:
-                ts = ts  # 파싱 실패 시 원본 유지
-
-        row = [
-            ts,
-            #str(service),
-            #str(pid),
-            #str(thread),
-            str(level),
-            str(logger),
-            str(message),
-        ]
-
-        lines.append(" | ".join(row).strip())
-
-    return "\n".join(lines)
-
 def build_metrics_block_table(metrics: Iterable) -> str:
     metrics = list(metrics)
     if not metrics:
@@ -100,7 +48,7 @@ def build_metrics_block_table(metrics: Iterable) -> str:
 
             if field == "timestamp":
 
-                value = value.strftime("%m-%dT%H:%M")
+                value = value.strftime("%H:%M:%S")
 
             row.append(str(value))
 
@@ -114,16 +62,85 @@ def build_metrics_block_table(metrics: Iterable) -> str:
         + "\n".join(lines)
         + "\n\nSYSTEM_METADATA_END\n\n"
     )
-    
-# def stringify_history(history):
 
-#     lines = []
+def _as_dict(obj: Any) -> dict:
+    if hasattr(obj, "model_dump"):
+        return obj.model_dump(by_alias=True)
 
-#     for h in history:
-#         if h["role"] not in ("user", "assistant"):
-#             continue
+    if hasattr(obj, "dict"):
+        return obj.dict(by_alias=True)
 
-#         lines.append(f'{h["role"]}: {h["content"]}')
-        
-#     return "\n".join(lines)
+    if isinstance(obj, Mapping):
+        return dict(obj)
 
+    return {}
+
+
+def _get_nested(data: dict, path: str) -> Any:
+    current = data
+    for key in path.split("."):
+        if not isinstance(current, dict):
+            return None
+        current = current.get(key)
+        if current is None:
+            return None
+    return current
+
+
+def _parse_ts(ts: Any) -> datetime:
+    if not ts:
+        return datetime.min
+    try:
+        return datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+    except Exception:
+        return datetime.min
+
+
+def _format_ts(ts: Any) -> str:
+    if not ts:
+        return ""
+    try:
+        dt = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+        return dt.strftime("%H:%M:%S")
+    except Exception:
+        return str(ts)
+
+
+def _normalize_cell(value: Any) -> str:
+    if value is None:
+        return ""
+
+    if isinstance(value, list):
+        return ",".join("" if v is None else str(v) for v in value)
+
+    return str(value).replace("\n", " ").replace("\r", " ").strip()
+
+
+def format_logs_as_table(logs: list[Any]) -> str:
+    lines = []
+
+    normalized_logs = []
+    for item in logs:
+        log = _as_dict(item)
+        ts = _get_nested(log, "log.@timestamp")
+        normalized_logs.append((log, _parse_ts(ts)))
+
+    normalized_logs.sort(key=lambda x: x[1])
+
+    header = " | ".join(display for display, _ in LOG_FIELDS)
+    lines.append(header)
+
+    for log, _ in normalized_logs:
+        row = []
+
+        for display_name, actual_path in LOG_FIELDS:
+            value = _get_nested(log, actual_path)
+
+            if actual_path == "log.@timestamp":
+                value = _format_ts(value)
+
+            row.append(_normalize_cell(value))
+
+        lines.append(" | ".join(row))
+
+    return "\n".join(lines)
