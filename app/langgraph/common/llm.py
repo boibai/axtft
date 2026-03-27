@@ -140,7 +140,7 @@ async def call_chat_llm(state: ChatState) -> ChatState:
         "model": MODEL_NAME,
         "messages": state["messages"],
         "temperature": 0.0,
-        "max_tokens": 1024,
+        "max_tokens": 8196,
     }
 
     resp = await client.post(VLLM_BASE_URL2, json=payload)

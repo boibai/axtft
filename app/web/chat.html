@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>채팅 테스트</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+        background: #f6f7fb;
+        color: #1f2937;
+      }
+      .container {
+        max-width: 920px;
+        margin: 32px auto;
+        padding: 0 16px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+      }
+      .header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 18px;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+      }
+      button {
+        border: 0;
+        background: #111827;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      button.secondary {
+        background: #6b7280;
+      }
+      #chatLog {
+        height: 440px;
+        overflow: auto;
+        padding: 16px;
+        background: #f9fafb;
+      }
+      .msg {
+        margin: 10px 0;
+        display: flex;
+      }
+      .bubble {
+        max-width: 80%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+      }
+      .user {
+        justify-content: flex-end;
+      }
+      .user .bubble {
+        background: #2563eb;
+        color: #fff;
+      }
+      .assistant .bubble {
+        background: #e5e7eb;
+      }
+      .meta {
+        padding: 10px 16px;
+        border-top: 1px solid #e5e7eb;
+        font-size: 12px;
+        color: #4b5563;
+      }
+
+      form {
+        display: flex;
+        gap: 8px;
+        padding: 12px;
+        border-top: 1px solid #e5e7eb;
+        align-items: flex-end;
+      }
+
+      textarea {
+        flex: 1;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 15px;
+        line-height: 1.5;
+        min-height: 72px;
+        max-height: 180px;
+        resize: none;
+        overflow-y: auto;
+        font-family: inherit;
+      }
+
+      #sendBtn {
+        height: 72px;
+        min-width: 72px;
+        align-self: flex-end;
+      }
+
+      .hint {
+        margin-top: 12px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="header">
+          <h1>실시간 채팅 테스트 화면</h1>
+          <div class="controls">
+            <button id="newSession" class="secondary" type="button">새 세션</button>
+            <button id="clearChat" type="button">채팅창 비우기</button>
+          </div>
+        </div>
+
+        <div id="chatLog"></div>
+
+        <form id="chatForm">
+          <textarea
+            id="messageInput"
+            placeholder="메시지를 입력하세요"
+            required
+          ></textarea>
+          <button id="sendBtn" type="submit">전송</button>
+        </form>
+
+        <div class="meta">thread_id: <span id="threadId">(자동 생성)</span></div>
+      </div>
+    </div>
+
+    <script>
+      const chatLog = document.getElementById("chatLog");
+      const chatForm = document.getElementById("chatForm");
+      const messageInput = document.getElementById("messageInput");
+      const threadIdEl = document.getElementById("threadId");
+      const clearChatBtn = document.getElementById("clearChat");
+      const newSessionBtn = document.getElementById("newSession");
+
+      let threadId = null;
+
+      function addMessage(role, text) {
+        const row = document.createElement("div");
+        row.className = `msg ${role}`;
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = text;
+
+        row.appendChild(bubble);
+        chatLog.appendChild(row);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      function autoResizeTextarea() {
+        messageInput.style.height = "auto";
+        messageInput.style.height = Math.min(messageInput.scrollHeight, 180) + "px";
+      }
+
+      async function sendMessage(message) {
+        addMessage("user", message);
+
+        const res = await fetch("/chat/message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ thread_id: threadId, message }),
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(errorText || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        threadId = data.thread_id;
+        threadIdEl.textContent = threadId;
+        addMessage("assistant", data.answer);
+      }
+
+      chatForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        messageInput.value = "";
+        autoResizeTextarea();
+
+        try {
+          await sendMessage(message);
+        } catch (error) {
+          addMessage("assistant", `오류가 발생했습니다: ${error.message}`);
+        }
+      });
+
+      messageInput.addEventListener("input", autoResizeTextarea);
+
+      messageInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          chatForm.requestSubmit();
+        }
+      });
+
+      clearChatBtn.addEventListener("click", () => {
+        chatLog.innerHTML = "";
+        addMessage("assistant", "채팅창만 비웠습니다. 서버 대화 기록과 thread_id는 유지됩니다.");
+      });
+
+      newSessionBtn.addEventListener("click", async () => {
+        const prevThreadId = threadId;
+
+        if (prevThreadId) {
+          try {
+            const res = await fetch(`/chat/${prevThreadId}`, { method: "DELETE" });
+            if (!res.ok) {
+              addMessage("assistant", "기존 세션 정리에 실패했지만 새 세션을 시작합니다.");
+            }
+          } catch (error) {
+            addMessage("assistant", `기존 세션 정리 중 오류가 발생했습니다: ${error.message}`);
+          }
+        }
+
+        threadId = null;
+        threadIdEl.textContent = "(자동 생성)";
+        chatLog.innerHTML = "";
+        addMessage("assistant", "새 대화 세션을 시작합니다.");
+      });
+
+      autoResizeTextarea();
+      addMessage("assistant", "안녕하세요. AX-TFT 모니터링 시스템 챗봇입니다.");
+    </script>
+  </body>
+</html>

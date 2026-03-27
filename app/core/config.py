@@ -95,3 +95,7 @@ CHAT_SYSTEM_PROMPT_PATH = os.getenv(
     "SYSTEM_PROMPT_PATH",
     "./app/prompts/chat_system_prompt.txt"
 )
+
+
+SEARCH_ENDPOINT = os.getenv("SEARCH_ENDPOINT")
+SEARCH_ADMIN_KEY = os.getenv("SEARCH_ADMIN_KEY")
