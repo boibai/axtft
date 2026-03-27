@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, Mapping, Iterable
 from app.core.config import METRIC_FIELDS, LOG_FIELDS
 
-def truncate_by_tokens(text: str, max_tokens: int = 4000, model: str = "gpt-oss-20b") -> str:
+def truncate_by_tokens(text: str, max_tokens: int = 8192, model: str = "gpt-oss-20b") -> str:
 
     encoding = tiktoken.encoding_for_model(model)
     tokens = encoding.encode(text)

@@ -62,7 +62,7 @@ async def run_interval_report(start_time, end_time, logger) -> dict[str, Any]:
         logger.error(e)
         logs = ""
     
-    log_llm_input = truncate_by_tokens(build_log_llm_input(logs), max_tokens=4096)
+    log_llm_input = truncate_by_tokens(build_log_llm_input(logs), max_tokens=8192)
     
     queries = build_metric_queries()
     metric_names = list(queries.keys())

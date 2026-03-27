@@ -13,7 +13,7 @@ def build_analyze_messages2(state: AnalyzeState) -> AnalyzeState:
 
     raw_error_log = state["message"].message
     
-    error_log = truncate_by_tokens(raw_error_log, max_tokens=4096)
+    error_log = truncate_by_tokens(raw_error_log, max_tokens=8192)
 
     logger.info("- SYSTEM_PROMPT_TOKEN : %s",count_tokens(system_prompt))
 

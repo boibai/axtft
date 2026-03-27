@@ -62,7 +62,7 @@ async def run_daily_report(target_time: datetime, logger) -> dict[str, Any]:
     reports = load_and_filter_reports(date_str)
 
     llm_input_text_raw = build_llm_input(reports)
-    llm_input_text = truncate_by_tokens(llm_input_text_raw, max_tokens=6144)
+    llm_input_text = truncate_by_tokens(llm_input_text_raw, max_tokens=8192)
 
     logger.info("%s INPUT INTERVAL REPORTS", "=" * 20)
     logger.info("\n%s", llm_input_text)

@@ -39,14 +39,14 @@ def save_daily_report(result: dict, date: str):
 
     return file_path
 
-def safe_get(d, *keys, default=None):
-    current = d
-    for key in keys:
-        if isinstance(current, dict):
-            current = current.get(key, default)
-        else:
-            return default
-    return current
+# def safe_get(d, *keys, default=None):
+#     current = d
+#     for key in keys:
+#         if isinstance(current, dict):
+#             current = current.get(key, default)
+#         else:
+#             return default
+#     return current
 
 
 def parse_log_message(message: str) -> dict:
@@ -320,12 +320,12 @@ def fetch_logs(
 
         rows.append(
             {
-                "log_time": log_time,
-                "log_level": parsed.get("log_level"),
+                "log_time": log_time.strip() if isinstance(log_time, str) else log_time,
+                "log_level": parsed.get("log_level", "").strip(),
                 "pid": parsed.get("pid"),
-                "thread": parsed.get("thread"),
-                "logger": parsed.get("logger"),
-                "log_text": parsed.get("log_text"),
+                "thread": parsed.get("thread", "").strip(),
+                "logger": parsed.get("logger", "").strip(),
+                "log_text": parsed.get("log_text", "").strip(),
                 "log_offset": safe_get(source, "log", "offset"),
             }
         )
@@ -468,8 +468,8 @@ def build_metric_llm_input(
                 non_null_count += 1
 
         ratio = non_null_count / len(valid_metric_names) if valid_metric_names else 0
-        if ratio < min_non_null_ratio:
-            continue
+        # if ratio < min_non_null_ratio:
+        #     continue
 
         values = [datetime.fromtimestamp(ts, tz=kst).strftime("%H:%M:%S")]
 

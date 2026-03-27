@@ -11,7 +11,7 @@ def build_analyze_messages(state: AnalyzeState) -> AnalyzeState:
 
     raw_error_log = state["message"].error.stack_trace
     
-    error_log = truncate_by_tokens(raw_error_log, max_tokens=4096)
+    error_log = truncate_by_tokens(raw_error_log, max_tokens=8192)
     
     metadata = state["message"]
 
