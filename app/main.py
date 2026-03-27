@@ -18,18 +18,26 @@ def resolve_request_log_dir(path: str) -> str:
         return os.path.join(LOG_DIR, "analyze/error")
     if path.startswith("/analyze/anomaly"):
         return os.path.join(LOG_DIR, "analyze/anomaly")
+    if path.startswith("/chat/message"):
+        return os.path.join(LOG_DIR, "chat/message")
     return None
 
 @app.middleware("http")
 async def request_file_logger_middleware(request: Request, call_next):
+    
+    body = await request.json()
 
+    thread_id = body.get("thread_id") or str(uuid.uuid4())[:8]
+
+    request.state.thread_id = thread_id
+    
     rid = request.headers.get("x-request-id")
     if not rid:
         rid = str(uuid.uuid4())[:8]
         
     log_dir = resolve_request_log_dir(request.url.path)
     if log_dir is not None:
-        start_request_file_logging(rid, log_dir)
+        start_request_file_logging(rid, log_dir, thread_id)
 
     try:
         response = await call_next(request)

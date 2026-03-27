@@ -5,7 +5,6 @@ from app.core.redis import get_redis_client
 redis_client = get_redis_client()
 chat_memory = ChatMemory(redis_client)
 
-
 def save_chat_memory(state: ChatState) -> ChatState:
     chat_memory.append_turn(
         thread_id=state["thread_id"],

@@ -61,10 +61,13 @@ def get_app_logger() -> logging.Logger:
     logger.addFilter(RequestContextFilter())
     return logger
 
-def start_request_file_logging(request_id: str, log_dir: str) -> str:
-
-    filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{request_id}.txt"
-
+def start_request_file_logging(request_id: str, log_dir: str, thread_id:str = None) -> str:
+    
+    if thread_id == None:
+        filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{request_id}.txt"
+    else :
+        filename = f"{datetime.now().strftime('%Y%m%d')}_{thread_id}.txt"
+        
     date_str = filename.split("_")[0]
     year = date_str[:4]
     month = date_str[4:6]

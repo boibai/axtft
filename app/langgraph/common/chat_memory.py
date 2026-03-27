@@ -41,7 +41,6 @@ class ChatMemory:
         role = message.get("role")
         content = message.get("content")
  
-       # 기존 LangGraph 저장 포맷(type=final)을 후방 호환 처리
         if message.get("type") == "final":
             role = message.get("role")
             content = message.get("content")

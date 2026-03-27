@@ -1,15 +1,13 @@
-from fastapi import APIRouter
-
+from fastapi import APIRouter, Request
 from app.application.chat_service import handle_chat, clear_chat
 from app.langgraph.common.schema import ChatRequest
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-
 @router.post("/message")
-async def chat_message(req: ChatRequest):
-    return await handle_chat(req)
-
+async def chat_message(req: ChatRequest, request: Request):
+    thread_id = request.state.thread_id
+    return await handle_chat(req, thread_id)
 
 @router.delete("/{thread_id}")
 def clear_chat_history(thread_id: str):
