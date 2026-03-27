@@ -1,7 +1,7 @@
 import json, os, re
 from fastapi import APIRouter, HTTPException
 from app.core.config import DATA_DIR
-from app.report.schema import IntervalReportRequest, IntervalReportFileRequest
+from app.report.schema import ListRequest, FileRequest
 from app.core.logging import get_app_logger
 
 logger = get_app_logger()
@@ -12,7 +12,7 @@ def get_interval_report_base_dir(type:str) -> str:
 
 
 @router.post("/interval")
-def list_interval_reports(req: IntervalReportRequest):
+def list_interval_reports(req: ListRequest):
     date = req.date
     base_dir = get_interval_report_base_dir(type="interval")
     
@@ -35,7 +35,7 @@ def list_interval_reports(req: IntervalReportRequest):
 
 
 @router.post("/interval/file")
-def get_interval_report(req: IntervalReportFileRequest):
+def get_interval_report(req: FileRequest):
     pattern = r"^\d{4}_\d{4}$"
     print(req.filename)
     if not re.match(pattern, req.filename):
@@ -57,7 +57,7 @@ def get_interval_report(req: IntervalReportFileRequest):
 
 
 @router.post("/daily")
-def list_daily_reports(req: IntervalReportRequest):
+def list_daily_reports(req: ListRequest):
     date = req.date
     base_dir = get_interval_report_base_dir(type="daily")
     date_dir = os.path.join(base_dir,date.split("-")[0],date.split("-")[1])
@@ -78,7 +78,7 @@ def list_daily_reports(req: IntervalReportRequest):
 
 
 @router.post("/daily/file")
-def get_daily_report(req: IntervalReportRequest):
+def get_daily_report(req: FileRequest):
     
     pattern = r"^\d{4}-\d{2}-\d{2}$"
     if not re.match(pattern, req.date):

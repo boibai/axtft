@@ -172,3 +172,11 @@ class ChatResponse(BaseModel):
     thread_id: str
     answer: str
     history_count: int
+    
+    
+class ListRequest(BaseModel):
+    date: str
+    
+class FileRequest(BaseModel):
+    date: str
+    filename: str

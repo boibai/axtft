@@ -12,10 +12,10 @@ class TenMinuteSummaryReport(BaseModel):
     summary: str
     events: List[EventSummary]
 
-class IntervalReportRequest(BaseModel):
+class ListRequest(BaseModel):
     date: str
     
-class IntervalReportFileRequest(BaseModel):
+class FileRequest(BaseModel):
     date: str
     filename: str
     
