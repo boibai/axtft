@@ -1,13 +1,8 @@
 import time, httpx, json
-from app.langgraph.common.state import AnalyzeState
+from app.langgraph.common.state import AnalyzeState, ChatState
 from app.langgraph.common.schema import ErrorCauseList, AnomalyCauseList
 from app.core.config import VLLM_BASE_URL, MODEL_NAME, VLLM_BASE_URL2
-from app.langgraph.common.chat_memory import ChatMemory
-from app.core.redis import get_redis_client
 from app.report.schema import TenMinuteSummaryReport, DailyReport
-
-redis_client = get_redis_client()
-chat_memory = ChatMemory(redis_client)
 
 # 비동기 HTTP 클라이언트 전역 생성 ( 재사용을 통해 커넥션 풀 활용 및 성능 최적화 )
 client = httpx.AsyncClient(
@@ -33,7 +28,6 @@ async def call_analyze_error_llm(state: AnalyzeState) -> AnalyzeState:
         "messages": state["messages"],
         "temperature": 0.0,
         "max_tokens": 4096,
-        # LLM 출력이 반드시 CauseList 스키마를 따르도록 강제
         "response_format": {
             "type": "json_schema",
             "json_schema": {
@@ -70,7 +64,6 @@ async def call_analyze_anomaly_llm(state: AnalyzeState) -> AnalyzeState:
         "messages": state["messages"],
         "temperature": 0.0,
         "max_tokens": 4096,
-        # LLM 출력이 반드시 CauseList 스키마를 따르도록 강제
         "response_format": {
             "type": "json_schema",
             "json_schema": {
@@ -113,7 +106,6 @@ async def call_report_llm(prompt: list, type: str) :
         "messages": prompt,
         "temperature": 0.0,
         "max_tokens": 4096,
-        # LLM 출력이 반드시 CauseList 스키마를 따르도록 강제
         "response_format": {
             "type": "json_schema",
             "json_schema": {
@@ -136,8 +128,24 @@ async def call_report_llm(prompt: list, type: str) :
         "elapsed_sec" : round(time.perf_counter() - start, 3)
     }
     
-    print(json.dumps(data, indent=2, ensure_ascii=False))
-    print(data["choices"][0]["message"]["content"])
+    # print(json.dumps(data, indent=2, ensure_ascii=False))
+    # print(data["choices"][0]["message"]["content"])
     result = json.loads(data["choices"][0]["message"]["content"])
 
     return result, metadata
+
+
+async def call_chat_llm(state: ChatState) -> ChatState:
+    payload = {
+        "model": MODEL_NAME,
+        "messages": state["messages"],
+        "temperature": 0.0,
+        "max_tokens": 1024,
+    }
+
+    resp = await client.post(VLLM_BASE_URL2, json=payload)
+    resp.raise_for_status()
+
+    state["llm_raw"] = resp.json()
+
+    return state

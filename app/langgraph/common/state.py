@@ -1,5 +1,5 @@
 from typing import TypedDict, Optional, Any, Dict, List, Literal
-from app.langgraph.common.schema import AnalyzeErrorRequest
+from app.langgraph.common.schema import AnalyzeErrorRequest, ChatRequest
 
 class AnalyzeState(TypedDict):
 
@@ -15,4 +15,14 @@ class AnalyzeState(TypedDict):
     client_ip: Optional[str]
     client_port: Optional[int]
     elapsed_sec: Optional[float]
+    error: Optional[str]
+    
+class ChatState(TypedDict):
+
+    thread_id: str
+    request: ChatRequest
+    messages: List[Dict[str, str]]
+    llm_raw: Dict[str, Any]
+    answer: Optional[str]
+    history_count: Optional[int]
     error: Optional[str]

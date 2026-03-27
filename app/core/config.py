@@ -90,3 +90,8 @@ DAILY_REPORT_SYSTEM_PROMPT_PATH = os.getenv(
 
 ELS_ID = os.getenv("ELS_ID")
 ELS_PW = os.getenv("ELS_PW")
+
+CHAT_SYSTEM_PROMPT_PATH = os.getenv(
+    "SYSTEM_PROMPT_PATH",
+    "./app/prompts/chat_system_prompt.txt"
+)

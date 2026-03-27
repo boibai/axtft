@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
 from app.langgraph.common.state import AnalyzeState
 from app.langgraph.common.llm import call_analyze_anomaly_llm
-from app.langgraph.analyze.anomaly.nodes.build_analyze_messages import build_analyze_messages
+from app.langgraph.analyze.anomaly.nodes.build_anomaly_messages import build_analyze_messages
 from app.langgraph.analyze.anomaly.nodes.parse import parse_json
 from app.langgraph.analyze.anomaly.nodes.validate import validate_schema
 

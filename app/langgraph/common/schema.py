@@ -161,6 +161,14 @@ class AnomalyCauseList(BaseModel):
     causeList: List[AnomalyCauseItem]
     
     
-    
 
 
+class ChatRequest(BaseModel):
+    thread_id: Optional[str] = None
+    message: str = Field(min_length=1)
+
+
+class ChatResponse(BaseModel):
+    thread_id: str
+    answer: str
+    history_count: int
