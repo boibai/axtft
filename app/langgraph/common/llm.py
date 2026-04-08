@@ -115,7 +115,7 @@ async def call_report_llm(prompt: list, type: str) :
         },
     }
 
-    resp = await client.post(VLLM_BASE_URL2, json=payload)
+    resp = await client.post(VLLM_BASE_URL, json=payload)
     resp.raise_for_status()
 
     data = resp.json()
