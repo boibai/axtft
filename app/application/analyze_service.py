@@ -5,6 +5,7 @@ from app.langgraph.analyze.anomaly.graph import analyze_anomaly_graph
 from app.core.logging import write_json_data, get_app_logger, get_current_request_id
 from app.core.time import now_kst, now_kst_str
 from app.langgraph.common.schema import AnalyzeErrorRequest, AnalyzeAnomalyRequest, AnalyzeErrorMessageRequest
+from app.utils.preprocess import preprocess_error_async
 
 logger = get_app_logger()
 
@@ -97,6 +98,7 @@ async def handle_error(
             "error_message": str(e),
         }
         write_json_data(filename, data, data_type="analyze/error")
+
         raise
 
     data = {
@@ -228,6 +230,7 @@ async def handle_error2(
             "error_message": str(e),
         }
         write_json_data(filename, data, data_type="analyze/error")
+        
         raise
 
     data = {
@@ -249,4 +252,7 @@ async def handle_error2(
     logger.info("- TOTAL_TOKEN : %s", result.get("total_tokens"))
     logger.info("%s END API","="*20)
     write_json_data(filename, data, data_type="analyze/error")
+    date_str = filename.split("_")[0] 
+    date = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+    await preprocess_error_async(index_name="error",date=date,filename=filename.split(".json")[0])
     return result["parsed_json"]
