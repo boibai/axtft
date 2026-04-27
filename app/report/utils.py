@@ -13,6 +13,7 @@ from app.core.config import (
 
 kst = timezone(timedelta(hours=9))
 
+# 10분 리포트 저장
 def save_interval_report(result: dict, start_time: datetime, end_time: datetime):
     
     date_str = start_time.strftime("%Y-%m-%d")
@@ -28,6 +29,7 @@ def save_interval_report(result: dict, start_time: datetime, end_time: datetime)
 
     return file_path
 
+# 일일 리포트 저장
 def save_daily_report(result: dict, date: str):
     base_dir = f"./data/report/daily/{date.split("-")[0]}/{date.split("-")[1]}"
     os.makedirs(base_dir, exist_ok=True)
@@ -39,16 +41,7 @@ def save_daily_report(result: dict, date: str):
 
     return file_path
 
-# def safe_get(d, *keys, default=None):
-#     current = d
-#     for key in keys:
-#         if isinstance(current, dict):
-#             current = current.get(key, default)
-#         else:
-#             return default
-#     return current
-
-
+# 로그 파싱 & 포멧 ( ex. -[2026-04-23 12:00:00,123] [ERROR] [123] --- [thread] logger : message )
 def parse_log_message(message: str) -> dict:
     if not message:
         return {
@@ -82,6 +75,7 @@ def parse_log_message(message: str) -> dict:
 
     return match.groupdict()
 
+# LLM 입력용 포맷 변환 ( ex. 12:00:01|ERROR|thread-1|MyService|DB timeout )
 def format_logs_for_llm(log_rows):
     lines = []
 
@@ -105,7 +99,8 @@ def format_logs_for_llm(log_rows):
 
     return "\n".join(lines)
 
-def get_last_15min_window(now):
+# 10분 단위 window 생성
+def get_last_10min_window(now):
     minute = (now.minute // 10) * 10
     end_time = now.replace(minute=minute, second=0, microsecond=0)
     start_time = end_time - timedelta(minutes=10)

@@ -12,7 +12,7 @@ router = APIRouter(prefix="/analyze")
 def get_anlayze_base_dir(type:str) -> str:
     return os.path.join(DATA_DIR, "analyze", type)
 
-
+## 사후분석 ( 메트릭 + 로그 + 에러 )
 @router.post("/error")
 async def analyze_error(req: AnalyzeErrorRequest, request: Request):
 
@@ -26,7 +26,7 @@ async def analyze_error(req: AnalyzeErrorRequest, request: Request):
         client_port=client_port,
     )
 
-## 임시
+## 사후분석 ( 에러만 )
 @router.post("/error_message")
 async def analyze_error_message(req: AnalyzeErrorMessageRequest, request: Request):
 
@@ -40,7 +40,7 @@ async def analyze_error_message(req: AnalyzeErrorMessageRequest, request: Reques
         client_port=client_port,
     )
 
-
+## 사전분석 ( 메트릭 + 로그 )
 @router.post("/anomaly")
 async def analyze_anomaly(req: AnalyzeAnomalyRequest, request: Request):
 
@@ -55,6 +55,7 @@ async def analyze_anomaly(req: AnalyzeAnomalyRequest, request: Request):
     )
 
 
+## 사전분석 리스트 불러오기 ( ./data/analyze/anomaly/년/월/일/)
 @router.post("/anomaly/list")
 def list_analyze_anomaly(req: ListRequest):
     date = req.date
@@ -77,7 +78,7 @@ def list_analyze_anomaly(req: ListRequest):
         "files": files,
     }
 
-
+## 사전분석 파일 불러오기 ( ./data/analyze/anomaly/년/월/일/)
 @router.post("/anomaly/file")
 def get_analyze_anomaly_file(req: FileRequest):
     pattern = r"^\d{8}_\d{6}_[a-z0-9]{8}$"
@@ -100,6 +101,7 @@ def get_analyze_anomaly_file(req: FileRequest):
     return data
 
 
+## 사후분석 리스트 불러오기 ( ./data/analyze/error/년/월/일/)
 @router.post("/error/list")
 def list_analyze_error(req: ListRequest):
     date = req.date
@@ -123,6 +125,7 @@ def list_analyze_error(req: ListRequest):
     }
 
 
+## 사후분석 파일 불러오기 ( ./data/analyze/error/년/월/일/)
 @router.post("/error/file")
 def get_analyze_error_file(req: FileRequest):
     pattern = r"^\d{8}_\d{6}_[a-z0-9]{8}$"

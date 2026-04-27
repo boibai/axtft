@@ -24,10 +24,22 @@ def _is_retryable_error(exc: Exception) -> bool:
 
 
 @retry(
+    # 최대 3번까지 재시도 (처음 1회 + 재시도 2회)
     stop=stop_after_attempt(3),
+    
+    # 재시도 간 대기 시간: 지수 증가 방식
+    # 1초 → 2초 → 4초 (최대 4초까지 제한)
     wait=wait_exponential(multiplier=1, min=1, max=4),
+    
+    # _is_retryable_error 함수가 True를 반환하는 예외에 대해서만 재시도
+    # (예: 네트워크 에러, 타임아웃 등)
     retry=retry_if_exception(_is_retryable_error),
+    
+    # 모든 재시도 실패 시 마지막 예외를 다시 발생시킴 (숨기지 않음)
     reraise=True,
+
+    # 재시도 전에 로그 출력 (WARNING 레벨)
+    # → 어떤 에러로 재시도하는지 로그로 확인 가능
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
 async def _run_error_graph_with_retry(state: dict):
@@ -59,6 +71,8 @@ async def _run_anomaly_graph_with_retry(state: dict):
         raise RuntimeError("LLM returned empty parsed_json")
 
     return result
+
+
 
 async def handle_error(
     message: AnalyzeErrorRequest,

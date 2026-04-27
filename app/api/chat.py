@@ -1,5 +1,5 @@
 from pathlib import Path
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response
 from fastapi.responses import FileResponse, StreamingResponse
 from app.application.chat_service import handle_chat, clear_chat
 from app.langgraph.common.schema import ChatRequest
@@ -9,6 +9,8 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 @router.post("/message")
 async def chat_message(req: ChatRequest, request: Request):
+    body = await req.json()
+    print(body)
     thread_id = request.state.thread_id
     return await handle_chat(req, thread_id)
     

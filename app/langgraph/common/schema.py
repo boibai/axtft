@@ -159,8 +159,6 @@ class AnomalyCauseItem(BaseModel):
 class AnomalyCauseList(BaseModel):
     riskLevel: Literal["LOW", "MEDIUM", "HIGH"]
     causeList: List[AnomalyCauseItem]
-    
-    
 
 
 class ChatRequest(BaseModel):
