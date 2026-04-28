@@ -7,8 +7,8 @@ class ChatMemory:
     def __init__(
          self,
          redis_client,
-         max_memory_tokens: int = 4096,
-         chars_per_token: int = 4,
+         max_memory_tokens: int = 2048,
+         chars_per_token: int = 2,
      ):
          self.redis = redis_client
          self.max_tokens = max_memory_tokens
